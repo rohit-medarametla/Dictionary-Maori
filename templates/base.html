@@ -2,9 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Maori Dictionary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"/>
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 </head>
 <body>
+<nav>
+    <div class="container">
+        <div class="navbar-brand">Dictionary.</div>
+        <div class="navbar-links">
+            <a href="/">home</a>
 
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+</nav>
+<div class="container">
+    <header>
+        <h1>Maori Dictionary</h1>
+        <h2>{% block pageheading %}{% endblock %}</h2>
+    </header>
+
+    <main>
+        {% block main %}
+        {% endblock %}
+    </main>
+</div>
 </body>
 </html>
