@@ -3,6 +3,7 @@ import sqlite3
 from sqlite3 import Error
 from flask_bcrypt import Bcrypt
 
+DATABASE = "C:/Users/Admin/OneDrive - Wellington College/Dictionary-Maori"
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "qwertyuiop"
@@ -33,7 +34,11 @@ def is_teacher():
         return True
 
 def put_data(query, params):
-    con = create_connection
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query, params)
+    con.commit()
+    con.close()
 
 @app.route('/signup', methods=['POST', 'GET'])
 def render_signup():
@@ -47,9 +52,9 @@ def render_signup():
         class_name = request.form.get('class_name').title().strip()
         password = request.form.get('password')
         password2 = request.form.get('password2')
-        admin = 0
+        teacher = 0
         if request.form.get('is_teacher') == 'on':
-            admin = 1
+            teacher = 1
 
         if password != password2:
             return redirect('\signup?error=Passwords+do+not+match')
@@ -76,7 +81,7 @@ def render_login():
         email = request.form['email'].strip().lower()
         password = request.form['password'].strip()
         query = """SELECT id, fname, password, is_teacher FROM user WHERE email= ?"""
-        con = create_connection(db_file)
+        con = create_connection(DATABASE)
         cur = con.cursor()
         cur.execute(query, (email,))
         user_data = cur.fetchone()
