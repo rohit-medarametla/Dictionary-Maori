@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block pageheading %}sign up{% endblock %}
+
+{% block main %}
+<form class="myform" method="post">
+    <div class="form-group">
+        <div class="form-label">First Name:</div>
+        <div class="form-element"><input type="text" name="fname" id="fname" required></div>
+    </div>
+    <div class="error">{{ fname_error }}</div>
+    <div class="form-group">
+        <div class="form-label">Last Name:</div>
+        <div class="form-element"><input type="text" name="lname" id="lname" required></div>
+    </div>
+    <div class="error">{{ lname_error }}</div>
+    <div class="form-group">
+        <div class="form-label">Email:</div>
+        <div class="form-element"><input type="email" name="email" id="email" required></div>
+    </div>
+    <div class="form-group">
+        <div class="form-label">Password:</div>
+        <div class="form-element"><input type="password" name="password" id="password" required></div>
+    </div>
+    <div class="error">{{ error }}</div>
+    <div class="form-group">
+        <div class="form-label">Confirm Password:</div>
+        <div class="form-element"><input type="password" name="password2" id="password2" required></div>
+    </div>
+    <div class="form-group">
+        <div class="form-label">Is teacher:</div>
+        <div class="form-element"><input type="checkbox" name="is_teacher" id="is_teacher" required></div>
+    </div>
+    <div class="form-group">
+        <div class="form-label">What year group:</div>
+        <div class="form-element"><input type="text" name="year_group" id="year_group" required></div>
+    </div>
+    <div class="form-group">
+        <div class="form-label">Class:</div>
+        <div class="form-element"><input type="text" name="class_name" id="class_name" required></div>
+    </div>
+    <div class="form-group">
+        <div class="form-label"></div>
+        <div class="form-element"><input type="submit" value="Signup"></div>
+    </div>
+</form>
+{% endblock %}
