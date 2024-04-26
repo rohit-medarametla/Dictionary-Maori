@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block pageheading %}
+menu
+{% endblock %}
+
+{% block main %}
+
+    <div class="products">
+        {% for maori_words in word %}
+        <div class="product-box">
+            <div class="product-box-heading">
+                <h2>{{ word[1] }}</h2>
+            </div>
+            <div class = "product-box-image">
+                <img src ="/static/images/{{ word[5] }}.jpg">
+            </div>
+            <div class="product-box-info">
+                <p><strong>Maori  :</strong> {{ word[1] }}</p>
+                <p><strong>English :</strong> {{ word[2] }}</p>
+                <p><strong>definition:</strong> {{ word[3] }}</p>
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+{% endblock %}

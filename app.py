@@ -1,3 +1,4 @@
+from idlelib import query
 from flask import Flask, render_template, redirect, request, session
 import sqlite3
 from sqlite3 import Error
@@ -8,6 +9,25 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "qwertyuiop"
 
+def get_list(query, params):
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    if params == "":
+        cur.execute(query)
+    else:
+        cur.execute(query, params)
+    query_list = cur.fetchall()
+    con.close()
+    return query_list
+
+def put_data(query, params):
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query, params)
+    con.commit()
+    con.close()
+
+
 def create_connection(db_file):
     try:
         connection = sqlite3.connect(db_file)
@@ -17,17 +37,13 @@ def create_connection(db_file):
         print("Error connecting to database:", e)
         return None
 
-@app.route('/')
-def hello_world():  # put application's code here
-    return render_template('home.html')
-
 def is_logged_in():
     if session.get('email') is None:
         return False
     else:
         return True
 
-def if_teacher():
+def is_teacher():
     if session.get('is_teacher')  != 1:
         print("student")
         return False
@@ -36,12 +52,22 @@ def if_teacher():
         return True
 
 
+@app.route('/')
+def render_home():  # put application's code here
+    con = create_connection(DATABASE)
+    query = ("SELECT Maori, English, Definition, level, image FROM maori_words")
+    cur = con.cursor()
+    cur.execute(query)
+    words_list = cur.fetchall()
+    con.close()
+    print(words_list)
+    return render_template('home.html', logged_in = is_logged_in())
 
 
 @app.route('/signup', methods=['POST', 'GET'])
 def render_signup():
     if is_logged_in():
-        return redirect('/')
+        return redirect('allwords.html')
     if request.method == 'POST':
         print(request.form)
         fname = request.form.get('fname').title()
@@ -55,37 +81,34 @@ def render_signup():
         if request.form.get('is_teacher') == 'on':
             teacher = 1
 
-
         if password != password2:
             return redirect("\signup?error=Passwords+do+not+match")
 
         if len(password) < 8:
             return redirect("\signup?error=Password+must+be+at+least+8+characters")
+        if len(password2) < 8:
+            return redirect("\signup?error=Password+must+be+at+least+8+characters")
 
         hashed_password = bcrypt.generate_password_hash(password)
-        con = create_connection(DATABASE)
-        query = ("INSERT INTO user (fname, lname, email, password, is_teacher, year_group, class_name) "
-                 "VALUES (?, ?, ?, ?, ?, ?, ?)")
-        cur = con.cursor()
+        #con = create_connection(DATABASE)
+        #query = ("INSERT INTO user (fname, lname, email, password, is_teacher, year_group, class_name) "
+                 #"VALUES (?, ?, ?, ?, ?, ?, ?)")
+        #cur = con.cursor()
 
         try:
-            cur.execute(query, (fname, lname, email, hashed_password, teacher, year_group, class_name))
-            con.commit()
+            put_data("INSERT INTO user (fname, lname, email, password, is_teacher, year_group, class_name) ""VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (fname, lname, email, hashed_password, teacher, year_group, class_name))
+            #con.commit()
+            #con.close()
         except sqlite3.IntegrityError:
-            con.close()
             return redirect('\signup?error=Email+is+already+used')
-
-
-        con.close()
-
+        #con.close()
         return redirect("\login")
-
-    return render_template('signup.html', logged_in=is_logged_in())
+    return render_template('signup.html', logged_in=is_logged_in(), is_teacher=is_teacher())
 
 @app.route('/login', methods=['POST', 'GET'])
 def render_login():
-    if is_logged_in():
-        return redirect('/menu/1')
+
     if request.method == 'POST':
         email = request.form['email'].strip().lower()
         password = request.form['password'].strip()
@@ -103,6 +126,7 @@ def render_login():
         except IndexError:
             return redirect('/login?error=Invalid+username+or+password')
 
+
         if not bcrypt.check_password_hash(db_password, password):
             return redirect(request.referrer + "?error=Email+invalid+or+password+incorrect")
 
@@ -112,13 +136,29 @@ def render_login():
         session['is_teacher'] = is_teacher
         return redirect('/')
 
-    return render_template('login.html')
+    return render_template('login.html',  logged_in=is_logged_in())
+
+@app.route('/allwords')
+def render_all_words():
+    con = create_connection(DATABASE)
+    query = ("SELECT Maori, English, Definition, level, image FROM maori_words")
+    cur = con.cursor()
+    cur.execute(query)
+    words_list = cur.fetchall()
+    con.close()
+    print(words_list)
+    return render_template("allwords.html", word=words_list)
+
+
+
+
 
 @app.route('/logout')
 def logout():
+    print(list(session.keys()))
     [session.pop(key) for key in list(session.keys())]
+    print(list(session.keys()))
     return redirect('/?message=See+you+next+time!')
-
 
 
 if __name__ == '__main__':
