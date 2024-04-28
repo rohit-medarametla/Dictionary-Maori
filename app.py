@@ -138,16 +138,15 @@ def render_login():
 
     return render_template('login.html',  logged_in=is_logged_in())
 
-@app.route('/allwords')
-def render_all_words():
-    con = create_connection(DATABASE)
-    query = ("SELECT Maori, English, Definition, level, image FROM maori_words")
-    cur = con.cursor()
-    cur.execute(query)
-    words_list = cur.fetchall()
-    con.close()
+@app.route('/allwords/<cat_id>')
+def render_all_words(cat_id):
+
+    words_list = get_list("SELECT Maori, English, Definition, level, image FROM maori_words WHERE cat_id=?",(cat_id, ))
+    category_list = get_list("SELECT * FROM category", "")
+
+
     print(words_list)
-    return render_template("allwords.html", word=words_list)
+    return render_template("allwords.html", word=words_list, categories=category_list )
 
 
 

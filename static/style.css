@@ -220,3 +220,15 @@ table {
         width: 100%;
     }
 }
+
+#content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 10px;
+}
+
+.content-item {
+    border: 2px solid #659DBD;
+    padding: 10px;
+    border-radius: 20px;
+}

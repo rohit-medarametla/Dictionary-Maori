@@ -1,27 +1,25 @@
 {% extends 'base.html' %}
 
 {% block pageheading %}
-menu
+
 {% endblock %}
 
 {% block main %}
+    <div class="category-menu">
+        {% for category in categories %}
+        <div class="category-item"><h2><a href="/allwords/ {{ category[0] }}">{{ category[1] }}</a></h2></div>
+        {% endfor %}
+    </div>
 
-    <div class="products">
-        {% for maori_words in word %}
-        <div class="product-box">
-            <div class="product-box-heading">
-                <h2>{{ word[1] }}</h2>
-            </div>
-            <div class = "product-box-image">
-                <img src ="/static/images/{{ word[5] }}.jpg">
-            </div>
-            <div class="product-box-info">
-                <p><strong>Maori  :</strong> {{ word[1] }}</p>
-                <p><strong>English :</strong> {{ word[2] }}</p>
-                <p><strong>definition:</strong> {{ word[3] }}</p>
-            </div>
+    <div class="content">
+        {% for id in word %}
 
-        </div>
+        <article class="content-item">
+                <td class="thumb"><img src="/static/images/{{ id[4] }}.jpg" alt="Word photo {{ id[4] }}"></td>
+                <p><strong>Maori:</strong> {{ id[0] }}</p>
+                <p><strong>English:</strong> {{ id[1] }}</p>
+                <p><strong>definition:</strong> {{ id[2] }}</p>
+        </article>
         {% endfor %}
 
     </div>
