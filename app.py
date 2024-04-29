@@ -117,6 +117,7 @@ def render_login():
         cur = con.cursor()
         cur.execute(query, (email,))
         user_data = cur.fetchone()
+        print(user_data)
         con.close()
         try:
             user_id = user_data[0]
@@ -140,17 +141,12 @@ def render_login():
 
 @app.route('/allwords/<cat_id>')
 def render_all_words(cat_id):
-
     words_list = get_list("SELECT Maori, English, Definition, level, image FROM maori_words WHERE cat_id=?",(cat_id, ))
     category_list = get_list("SELECT * FROM category", "")
-
-
     print(words_list)
     return render_template("allwords.html", word=words_list, categories=category_list )
 
-
-
-
+@app.route()
 
 @app.route('/logout')
 def logout():
@@ -158,6 +154,64 @@ def logout():
     [session.pop(key) for key in list(session.keys())]
     print(list(session.keys()))
     return redirect('/?message=See+you+next+time!')
+@app.route('/admin')
+def render_admin():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in.')
+    category_list = get_list("SELECT * FROM category", "")
+
+    return render_template("admin.html", logged_in=is_logged_in(), is_teacher=is_teacher(), categories=category_list)
+
+@app.route('/add_category', methods=['POST'])
+def add_category():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in.')
+    if request.method == "POST":
+        cat_name = request.form.get('name').lower().strip()
+        put_data('INSERT INTO category (name) VALUES (?)', (cat_name,))
+        return redirect('/admin')
+
+@app.route('/add_newword', methods=['POST'])
+def add_word():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in.')
+    if request.method == "POST":
+        mao_word = request.form.get('Maori').lower().strip()
+        eng_word = request.form.get('English').lower().strip()
+        deff = request.form.get('Definition').lower().strip()
+        level = request.form.get('level').lower().strip()
+        category = request.form.get('cat_id')
+        put_data('INSERT INTO maori_words (Maori, English, Definition, level) VALUES (?,?,?,?)', (mao_word, eng_word, deff, level, ))
+
+    return redirect('/admin')
+
+
+
+@app.route('/delete_category', methods=['POST'])
+def render_delete_category():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in.')
+    if request.method == "POST":
+        category = request.form.get('cat_id')
+        category = category.split(", ")
+        cat_id = category[0]
+        cat_name = category[1]
+        return render_template("delete_confirm.html", id=cat_id, name=cat_name, type="category", logged_in=is_logged_in(), is_teacher=is_teacher())
+    return redirect('/admin')
+
+@app.route('/delete_category_confirm/<category_id>')
+def delete_category_confirm(category_id):
+    if not is_logged_in():
+        return redirect('/?message=Need+tobe+logged+in.')
+    con = create_connection(DATABASE)
+    query = 'DELETE FROM category WHERE id = ?'
+    cur = con.cursor()
+    cur.execute(query, (category_id,))
+    con.commit()
+    con.close()
+    return redirect('/admin')
+
+
 
 
 if __name__ == '__main__':
