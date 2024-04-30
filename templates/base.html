@@ -17,7 +17,8 @@
             {% if logged_in %}
             <a href="/logout">logout</a>
             <a href="/allwords/<cat_id>">All words </a>
-             <a href="admin">Admin</a>
+             <a href="/admin">Admin</a>
+              <a href="/category/<cat_id>">Category</a>
             {% else %}
             <a href="/login">login</a>
             {% endif %}

@@ -14,11 +14,12 @@ def get_list(query, params):
     cur = con.cursor()
     if params == "":
         cur.execute(query)
+
     else:
         cur.execute(query, params)
     query_list = cur.fetchall()
     con.close()
-    return query_list
+    return query_list,
 
 def put_data(query, params):
     con = create_connection(DATABASE)
@@ -139,14 +140,30 @@ def render_login():
 
     return render_template('login.html',  logged_in=is_logged_in())
 
-@app.route('/allwords/<cat_id>')
-def render_all_words(cat_id):
-    words_list = get_list("SELECT Maori, English, Definition, level, image FROM maori_words WHERE cat_id=?",(cat_id, ))
-    category_list = get_list("SELECT * FROM category", "")
-    print(words_list)
-    return render_template("allwords.html", word=words_list, categories=category_list )
 
-@app.route()
+
+@app.route('/allwords/<cat_id>')
+def render_category(cat_id):
+    query = "SELECT * FROM category"
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query)
+    category_list = cur.fetchall()
+    con.close()
+    query = "SELECT Maori, English, Definition, level, image FROM maori_words "
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query)
+    words_list = cur.fetchall()
+    con.close()
+    print(words_list)
+    return render_template("allwords.html", word=words_list, categories=category_list, logged_in=is_logged_in())
+
+
+
+
+
+
 
 @app.route('/logout')
 def logout():
