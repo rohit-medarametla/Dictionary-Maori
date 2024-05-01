@@ -5,15 +5,9 @@
 {% endblock %}
 
 {% block main %}
-    <div class="category-menu">
-        {% for category in categories %}
-        <div class="category-item"><h2><a href="/category/{{ category[0] }}">{{ category[1] }}
-         </a></h2></div>
-        {% endfor %}
-    </div>
 
     <div class="products">
-        {% for id in word %}
+        {% for id in wordinfo %}
         <div class="product-box">
             <div class="product-box-heading">
                 <h2><a href="/word_detail/{{ id[0] }}">{{ id[2] }}</a></h2>

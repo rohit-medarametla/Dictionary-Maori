@@ -155,7 +155,7 @@ def render_all_words():
     return render_template("allwords.html", word=words_list,  logged_in=is_logged_in())
 @app.route('/category/<cat_id>')
 def render_category(cat_id):
-    query = "SELECT Maori, English, Definition, level, image FROM maori_words WHERE cat_id=? "
+    query = "SELECT id, Maori, English, Definition, level, image FROM maori_words WHERE cat_id=? "
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query, (cat_id,))
@@ -170,8 +170,19 @@ def render_category(cat_id):
     category_list = cur.fetchall()
     print(category_list)
     con.close()
-
     return render_template("category.html", word=words_list, categories=category_list, logged_in=is_logged_in())
+
+@app.route('/word_detail/<id>')
+def render_word_detail(id):
+    query = "SELECT id, Maori, English, Definition, level, image FROM maori_words WHERE id=?"
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query, (id,))
+    about_word = cur.fetchall()
+    con.close()
+    return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in())
+
+
 
 @app.route('/logout')
 def logout():
