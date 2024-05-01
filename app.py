@@ -142,14 +142,9 @@ def render_login():
 
 
 
-@app.route('/allwords/<cat_id>')
-def render_category(cat_id):
-    query = "SELECT * FROM category"
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query)
-    category_list = cur.fetchall()
-    con.close()
+@app.route('/allwords')
+def render_all_words():
+
     query = "SELECT Maori, English, Definition, level, image FROM maori_words "
     con = create_connection(DATABASE)
     cur = con.cursor()
@@ -157,7 +152,23 @@ def render_category(cat_id):
     words_list = cur.fetchall()
     con.close()
     print(words_list)
-    return render_template("allwords.html", word=words_list, categories=category_list, logged_in=is_logged_in())
+    return render_template("allwords.html", word=words_list,  logged_in=is_logged_in())
+@app.route('/category/<cat_id>')
+def render_category(cat_id):
+    query = "SELECT * FROM category"
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query)
+    category_list = cur.fetchall()
+    con.close()
+    query = "SELECT Maori, English, Definition, level, image FROM maori_words WHERE cat_id=? "
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query, (cat_id,))
+    words_list = cur.fetchall()
+    con.close()
+    print(words_list)
+    return render_template("category.html", word=words_list, categories=category_list, logged_in=is_logged_in())
 
 
 
