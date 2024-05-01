@@ -140,12 +140,9 @@ def render_login():
 
     return render_template('login.html',  logged_in=is_logged_in())
 
-
-
 @app.route('/allwords')
 def render_all_words():
-
-    query = "SELECT Maori, English, Definition, level, image FROM maori_words "
+    query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query)
@@ -194,9 +191,25 @@ def logout():
 def render_admin():
     if not is_logged_in():
         return redirect('/?message=Need+to+be+logged+in.')
-    category_list = get_list("SELECT * FROM category", "")
+    else:
+        query1 = "SELECT * FROM category"
+        con = create_connection(DATABASE)
+        cur = con.cursor()
+        cur.execute(query1)
+        category_list = cur.fetchall()
+        con.close()
 
-    return render_template("admin.html", logged_in=is_logged_in(), is_teacher=is_teacher(), categories=category_list)
+        query = "SELECT id, English, FROM maori_words"
+        con = create_connection(DATABASE)
+        cur = con.cursor()
+        cur.execute(query)
+        word_d = cur.fetchall()
+        con.close()
+
+        # category_list = get_list("SELECT * FROM category", "")
+
+
+    return render_template("admin.html", logged_in=is_logged_in(), is_teacher=is_teacher(), categories=category_list, word_de=word_d)
 
 @app.route('/add_category', methods=['POST'])
 def add_category():
