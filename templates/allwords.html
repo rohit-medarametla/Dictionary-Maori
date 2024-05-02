@@ -7,10 +7,12 @@
 {% block main %}
     <div class="category-menu">
         {% for category in categories %}
-        <div class="category-item"><h2><a href="/allwords/{{ category[0] }}">{{ category[1] }}</a></h2></div>
+        <div class="category-item"><h2><a href="/category/{{ category[0] }}">{{ category[1] }}
+         </a></h2></div>
         {% endfor %}
     </div>
-         <div class="products">
+
+    <div class="products">
         {% for id in word %}
         <div class="product-box">
             <div class="product-box-heading">
@@ -24,9 +26,8 @@
                 <p><strong>Maori:</strong> {{ id[1] }}</p>
             </div>
 
-        </div>
-        {% endfor %}
-
     </div>
+    {% endfor %}
+
 {% endblock %}
 

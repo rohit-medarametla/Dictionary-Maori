@@ -142,16 +142,32 @@ def render_login():
 
 @app.route('/allwords')
 def render_all_words():
+    query = "SELECT * FROM category"
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query)
+    category_list = cur.fetchall()
+    con.close()
+
     query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query)
     words_list = cur.fetchall()
     con.close()
-    print(words_list)
-    return render_template("allwords.html", word=words_list,  logged_in=is_logged_in())
+
+    return render_template("allwords.html", word=words_list,  logged_in=is_logged_in(), categories=category_list)
 @app.route('/category/<cat_id>')
 def render_category(cat_id):
+    title = cat_id
+    query = "SELECT * FROM category"
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query)
+    category_list = cur.fetchall()
+    print(category_list)
+    con.close()
+
     query = "SELECT id, Maori, English, Definition, level, image FROM maori_words WHERE cat_id=? "
     con = create_connection(DATABASE)
     cur = con.cursor()
@@ -160,14 +176,7 @@ def render_category(cat_id):
     con.close()
     print(words_list)
 
-    query1 = "SELECT * FROM category"
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query1)
-    category_list = cur.fetchall()
-    print(category_list)
-    con.close()
-    return render_template("category.html", word=words_list, categories=category_list, logged_in=is_logged_in())
+    return render_template("category.html", word=words_list, categories=category_list, logged_in=is_logged_in(), title=title)
 
 @app.route('/word_detail/<id>')
 def render_word_detail(id):
@@ -189,9 +198,7 @@ def logout():
     return redirect('/?message=See+you+next+time!')
 @app.route('/admin')
 def render_admin():
-    if not is_logged_in():
-        return redirect('/?message=Need+to+be+logged+in.')
-    else:
+    if is_logged_in():
         query1 = "SELECT * FROM category"
         con = create_connection(DATABASE)
         cur = con.cursor()
@@ -199,14 +206,20 @@ def render_admin():
         category_list = cur.fetchall()
         con.close()
 
-        query = "SELECT id, English, FROM maori_words"
+        query2 = "SELECT id, English FROM maori_words"
         con = create_connection(DATABASE)
         cur = con.cursor()
-        cur.execute(query)
+        print(f'query = {query2}')
+        cur.execute(query2)
         word_d = cur.fetchall()
+        print(word_d)
         con.close()
 
         # category_list = get_list("SELECT * FROM category", "")
+
+        print(f'you are at the end of admin rendering')
+    else:
+        return redirect('/?message=Need+to+be+logged+in.')
 
 
     return render_template("admin.html", logged_in=is_logged_in(), is_teacher=is_teacher(), categories=category_list, word_de=word_d)
@@ -260,8 +273,29 @@ def delete_category_confirm(category_id):
     con.close()
     return redirect('/admin')
 
+@app.route('/delete_word', methods=['POST'])
+def render_delete_word():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in.')
+    if request.method == "POST":
+        word = request.form.get('word')
+        word = word.split(", ")
+        id1 = word[0]
+        name_s = word[1]
+        return render_template("delete_confirm1.html", id=id1, name=name_s, type="word", logged_in=is_logged_in(), is_teacher=is_teacher())
+    return redirect('/admin')
 
-
+@app.route('/delete_word_confirm/<id>')
+def delete_word_confirm(id):
+    if not is_logged_in():
+        return redirect('/?message=Need+tobe+logged+in.')
+    con = create_connection(DATABASE)
+    query = 'DELETE FROM maori_words WHERE id = ?'
+    cur = con.cursor()
+    cur.execute(query, (id,))
+    con.commit()
+    con.close()
+    return redirect('/admin')
 
 if __name__ == '__main__':
     app.run()
