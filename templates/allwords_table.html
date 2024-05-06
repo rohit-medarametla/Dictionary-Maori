@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block pageheading %}
+
+{% endblock %}
+
+{% block main %}
+    <div class="category-menu">
+        {% for category in categories %}
+        <div class="category-item"><h2><a href="/category/{{ category[0] }}">{{ category[1] }}
+         </a></h2></div>
+        {% endfor %}
+    </div>
+    <table class="list">
+
+        <tr>
+            <th style="width:35%">Maori Word</th>
+            <th style="width:35%">English Translation</th>
+            <th style="width:15%">Level</th>
+            <th style="width:15%">Category</th>
+
+        </tr>
+
+
+          {% for id in word %}
+         <tr>
+        <td>{{ id[1] }}</td>
+        <td><a href="/word_detail/{{ id[0] }}">{{ id[2] }}</a></td>
+        <td>{{ id[4] }}</td>
+        <td>Pending</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+
+{% endblock %}
+

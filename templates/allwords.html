@@ -18,16 +18,14 @@
             <div class="product-box-heading">
                 <h2><a href="/word_detail/{{ id[0] }}">{{ id[2] }}</a></h2>
             </div>
-            <div class = "product-box-image">
-                <img src ="/static/images/{{ id[5] }}.jpg">
-            </div>
-            <div class="product-box-info">
+            <div class="product-box-info-big">
                 <p><strong>English:</strong> {{ id[2] }}</p>
                 <p><strong>Maori:</strong> {{ id[1] }}</p>
             </div>
 
     </div>
     {% endfor %}
+
 
 {% endblock %}
 

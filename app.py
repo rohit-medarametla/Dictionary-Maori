@@ -91,19 +91,11 @@ def render_signup():
             return redirect("\signup?error=Password+must+be+at+least+8+characters")
 
         hashed_password = bcrypt.generate_password_hash(password)
-        #con = create_connection(DATABASE)
-        #query = ("INSERT INTO user (fname, lname, email, password, is_teacher, year_group, class_name) "
-                 #"VALUES (?, ?, ?, ?, ?, ?, ?)")
-        #cur = con.cursor()
-
         try:
             put_data("INSERT INTO user (fname, lname, email, password, is_teacher, year_group, class_name) ""VALUES (?, ?, ?, ?, ?, ?, ?)",
             (fname, lname, email, hashed_password, teacher, year_group, class_name))
-            #con.commit()
-            #con.close()
         except sqlite3.IntegrityError:
             return redirect('\signup?error=Email+is+already+used')
-        #con.close()
         return redirect("\login")
     return render_template('signup.html', logged_in=is_logged_in(), is_teacher=is_teacher())
 
@@ -120,23 +112,26 @@ def render_login():
         user_data = cur.fetchone()
         print(user_data)
         con.close()
-        try:
-            user_id = user_data[0]
-            first_name = user_data[1]
-            db_password = user_data[2]
-            is_teacher = user_data[3]
-        except IndexError:
-            return redirect('/login?error=Invalid+username+or+password')
+        if user_data == None:
+             redirect('/login?error=Invalid+username+or+password')
+        else:
+            try:
+                user_id = user_data[0]
+                first_name = user_data[1]
+                db_password = user_data[2]
+                is_teacher = user_data[3]
+            except IndexError:
+                return redirect('/login?error=Invalid+username+or+password')
 
 
-        if not bcrypt.check_password_hash(db_password, password):
-            return redirect(request.referrer + "?error=Email+invalid+or+password+incorrect")
+            if not bcrypt.check_password_hash(db_password, password):
+                return redirect(request.referrer + "?error=Email+invalid+or+password+incorrect")
 
-        session['email'] = email
-        session['user_id'] = user_id
-        session['firstname'] = first_name
-        session['is_teacher'] = is_teacher
-        return redirect('/')
+            session['email'] = email
+            session['user_id'] = user_id
+            session['firstname'] = first_name
+            session['is_teacher'] = is_teacher
+            return redirect('/')
 
     return render_template('login.html',  logged_in=is_logged_in())
 
@@ -243,7 +238,10 @@ def add_word():
         deff = request.form.get('Definition').lower().strip()
         level = request.form.get('level').lower().strip()
         category = request.form.get('cat_id')
-        put_data('INSERT INTO maori_words (Maori, English, Definition, level) VALUES (?,?,?,?)', (mao_word, eng_word, deff, level, ))
+        category = category.split(", ")
+        cat_id = category[0]
+        put_data('INSERT INTO maori_words (Maori, English, Definition, level, cat_id) VALUES (?,?,?,?,?)', (mao_word, eng_word, deff, level, cat_id, ))
+
 
     return redirect('/admin')
 
@@ -296,6 +294,32 @@ def delete_word_confirm(id):
     con.commit()
     con.close()
     return redirect('/admin')
+
+@app.route('/search', methods=['GET', 'POST'])
+def render_search():
+    search = request.form['search']
+    title = "Search for " + search
+    query = "SELECT id, Maori, English, definition, level  FROM maori_words WHERE " \
+            "id like ? or Maori like ? OR English like ? OR definition like ? OR level like ? "
+    search = "%" + search + "%"
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query, (search, search, search, search, search))
+    search_list = cur.fetchall()
+    con.close()
+    return render_template("allwords.html", find=search_list, title=title)
+
+@app.route('/allwords_table')
+def table():
+    query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query, )
+    words_list = cur.fetchall()
+    con.close()
+    print(words_list)
+
+    return render_template("allwords_table.html", word=words_list, logged_in=is_logged_in())
 
 if __name__ == '__main__':
     app.run()

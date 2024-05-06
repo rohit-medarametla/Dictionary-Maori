@@ -118,6 +118,20 @@ a, a:visited {
     margin-bottom: 0.5rem;
 }
 
+.product-box-big {
+    /*width: 13vw;*/
+    width: 50%;
+    /*float: left;*/
+    /*display: table-cell;*/
+    /*padding: 0.5rem;*/
+    /*margin: 1vw;*/
+    border: 1px solid rgba(189, 195, 199, 1.0);
+    color: rgba(44, 62, 80, 1.0);
+    margin-bottom: 0.5rem;
+}
+
+
+
 .product-box-heading {
     padding: 0.5rem;
 }
@@ -131,6 +145,9 @@ a, a:visited {
     padding: 0.5rem;
 
 }
+
+
+
 
 .product-box h3 {
     font-size: 1.2rem;
@@ -186,7 +203,9 @@ a, a:visited {
 }
 
 table {
+font-family: Arial, Helvetica, sans-serif;
     border-collapse: collapse;
+    width: 100%;
 }
 
 .cart-table > thead {
@@ -231,4 +250,33 @@ table {
     border: 2px solid #659DBD;
     padding: 10px;
     border-radius: 20px;
+}
+
+td{
+    border: 5px solid skyblue;
+    padding: 10px;
+}
+
+th{
+    border: 5px solid skyblue;
+    color: #344fff;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 5px;
+}
+
+.list {border: 1px solid #b4b4b4;}
+
+.list tr:nth-child(odd) {background-color: #fdfdfd;}
+
+.list tr:nth-child(even) {background-color: #f2f2f2;}
+
+.list tr:hover {background-color: #dddddd;}
+
+td, th {
+  border: 1px solid #b4b4b4;
+  padding: 8px;
 }
