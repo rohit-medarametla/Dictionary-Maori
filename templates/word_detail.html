@@ -1,30 +1,35 @@
 {% extends 'base.html' %}
-
 {% block pageheading %}
-
 {% endblock %}
-
 {% block main %}
-
-    <div class="products">
-        {% for id in wordinfo %}
-        <div class="product-box-big">
-            <div class="product-box-heading">
-                <h2><a href="/word_detail/{{ id[0] }}">{{ id[2] }}</a></h2>
-            </div>
-            <div class = "product-box-image">
-                <img src ="/static/images/{{ id[5] }}.jpg">
-            </div>
-            <div class="product-box-info">
-                <p><strong>English:</strong> {{ id[2] }}</p>
-                <p><strong>Maori:</strong> {{ id[1] }}</p>
-                <p><strong>Definition:</strong> {{ id[3] }}</p>
-                <p><strong>Level:</strong> {{ id[4] }}</p>
-
-            </div>
-
-    </div>
+    <table class="info">
+    <tr class="header">
+    {% for id in wordinfo %}
+        <td style="width:25%">Maori Word</td>
+        <td style="width:25%">English Translation</td>
+        <td style="width:25%">Category</td>
+        <td style="width:25%">Level</td>
+    </tr>
+    <tr>
+        <td>{{ id[1] }}</td>
+        <td>{{ id[2] }}</td>
+        <td>Pending</td>
+        <td>{{ id[4] }}</td>
+    </tr>
+    <tr class="header">
+        <td colspan="4">Definition</td>
+    </tr>
+    <tr>
+        <td colspan="4">{{ id[3] }}</td>
+    </tr>
+    <tr class="header">
+        <td colspan="4">Image</td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <img src="/static/images/{{ id[5] }}.jpg">
+        </td>
+    </tr>
     {% endfor %}
-
 {% endblock %}
 

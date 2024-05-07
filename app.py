@@ -144,11 +144,16 @@ def render_all_words():
     category_list = cur.fetchall()
     con.close()
 
+    #query = ("SELECT id, Maori, English, Definition, level, image, category_name FROM maori_words w "
+             #"INNER JOIN category c ON w.cat_id = c.id "
+             #"WHERE cat_id=?")
+
     query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query)
     words_list = cur.fetchall()
+    print(words_list)
     con.close()
 
     return render_template("allwords.html", word=words_list,  logged_in=is_logged_in(), categories=category_list)
@@ -162,8 +167,7 @@ def render_category(cat_id):
     category_list = cur.fetchall()
     print(category_list)
     con.close()
-
-    query = "SELECT id, Maori, English, Definition, level, image FROM maori_words WHERE cat_id=? "
+    query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query, (cat_id,))
@@ -225,7 +229,7 @@ def add_category():
         return redirect('/?message=Need+to+be+logged+in.')
     if request.method == "POST":
         cat_name = request.form.get('name').lower().strip()
-        put_data('INSERT INTO category (name) VALUES (?)', (cat_name,))
+        put_data('INSERT INTO category (category_name) VALUES (?)', (cat_name,))
         return redirect('/admin')
 
 @app.route('/add_newword', methods=['POST'])
@@ -256,7 +260,7 @@ def render_delete_category():
         category = category.split(", ")
         cat_id = category[0]
         cat_name = category[1]
-        return render_template("delete_confirm.html", id=cat_id, name=cat_name, type="category", logged_in=is_logged_in(), is_teacher=is_teacher())
+        return render_template("delete_confirm.html", id=cat_id, category_name=cat_name, type="category", logged_in=is_logged_in(), is_teacher=is_teacher())
     return redirect('/admin')
 
 @app.route('/delete_category_confirm/<category_id>')

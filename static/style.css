@@ -280,3 +280,11 @@ td, th {
   border: 1px solid #b4b4b4;
   padding: 8px;
 }
+
+.list th, .info .header {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #646464;
+  color: white;
+}
