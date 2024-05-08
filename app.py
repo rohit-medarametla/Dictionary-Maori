@@ -87,8 +87,6 @@ def render_signup():
 
         if len(password) < 8:
             return redirect("\signup?error=Password+must+be+at+least+8+characters")
-        if len(password2) < 8:
-            return redirect("\signup?error=Password+must+be+at+least+8+characters")
 
         hashed_password = bcrypt.generate_password_hash(password)
         try:
@@ -113,7 +111,7 @@ def render_login():
         print(user_data)
         con.close()
         if user_data == None:
-             redirect('/login?error=Invalid+username+or+password')
+             redirect(request.referrer + '?error=Invalid+username+or+password')
         else:
             try:
                 user_id = user_data[0]
@@ -143,15 +141,13 @@ def render_all_words():
     cur.execute(query)
     category_list = cur.fetchall()
     con.close()
+    query = ("SELECT Maori, English, Definition, level, image, category_name FROM maori_words m "
+             "INNER JOIN category c ON m.cat_id_fk = c.cat_id")
 
-    #query = ("SELECT id, Maori, English, Definition, level, image, category_name FROM maori_words w "
-             #"INNER JOIN category c ON w.cat_id = c.id "
-             #"WHERE cat_id=?")
-
-    query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
+    #query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
     con = create_connection(DATABASE)
     cur = con.cursor()
-    cur.execute(query)
+    cur.execute(query )
     words_list = cur.fetchall()
     print(words_list)
     con.close()
@@ -167,7 +163,7 @@ def render_category(cat_id):
     category_list = cur.fetchall()
     print(category_list)
     con.close()
-    query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
+    query = "SELECT word_id, Maori, English, Definition, level, image FROM maori_words "
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query, (cat_id,))
@@ -179,7 +175,8 @@ def render_category(cat_id):
 
 @app.route('/word_detail/<id>')
 def render_word_detail(id):
-    query = "SELECT id, Maori, English, Definition, level, image FROM maori_words WHERE id=?"
+    query = ("SELECT word_id, Maori, English, Definition, level, image, category_name FROM maori_words m "
+             "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?")
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query, (id,))
@@ -315,7 +312,7 @@ def render_search():
 
 @app.route('/allwords_table')
 def table():
-    query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
+    query = "SELECT word_id, Maori, English, Definition, level, image FROM maori_words "
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query, )
