@@ -176,7 +176,8 @@ def render_category(cat_id):
 
 @app.route('/word_detail/<id>')
 def render_word_detail(id):
-    query = ("SELECT word_id, Maori, English, Definition, level, image, category_name FROM maori_words m "
+    query = ("SELECT Maori, English, Definition, level, image, category_name, fname FROM maori_words m "
+             "INNER JOIN user u on m.user_id_fk = u.user_id "
              "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?")
     con = create_connection(DATABASE)
     cur = con.cursor()
