@@ -241,10 +241,10 @@ def add_word():
         level = request.form.get('level').lower().strip()
         user_id = session.get('user_id')
         category = request.form.get('cat_id')
-
+        image = "noimage"
         category = category.split(", ")
         cat_id = category[0]
-        put_data('INSERT INTO maori_words (Maori, English, Definition, level, cat_id_fk,user_id_fk ) VALUES (?,?,?,?,?,?)', (mao_word, eng_word, deff, level, cat_id, user_id,))
+        put_data('INSERT INTO maori_words (Maori, English, Definition, level, image, cat_id_fk,user_id_fk ) VALUES (?,?,?,?,?,?, ?)', (mao_word, eng_word, deff, level, image, cat_id, user_id,))
 
 
     return redirect('/admin')
