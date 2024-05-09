@@ -103,7 +103,7 @@ def render_login():
     if request.method == 'POST':
         email = request.form['email'].strip().lower()
         password = request.form['password'].strip()
-        query = """SELECT id, fname, password, is_teacher FROM user WHERE email= ?"""
+        query = """SELECT user_id, fname, password, is_teacher FROM user WHERE email= ?"""
         con = create_connection(DATABASE)
         cur = con.cursor()
         cur.execute(query, (email,))
@@ -141,8 +141,9 @@ def render_all_words():
     cur.execute(query)
     category_list = cur.fetchall()
     con.close()
-    query = ("SELECT Maori, English, Definition, level, image, category_name FROM maori_words m "
-             "INNER JOIN category c ON m.cat_id_fk = c.cat_id")
+    query = ("SELECT Maori, English, Definition, level, image, category_name, fname FROM maori_words m "
+             "INNER JOIN user u on m.user_id_fk = u.user_id "
+             "INNER JOIN category c ON m.cat_id_fk = c.cat_id  ")
 
     #query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
     con = create_connection(DATABASE)
@@ -202,7 +203,7 @@ def render_admin():
         category_list = cur.fetchall()
         con.close()
 
-        query2 = "SELECT id, English FROM maori_words"
+        query2 = "SELECT word_id, English FROM maori_words"
         con = create_connection(DATABASE)
         cur = con.cursor()
         print(f'query = {query2}')
@@ -238,10 +239,12 @@ def add_word():
         eng_word = request.form.get('English').lower().strip()
         deff = request.form.get('Definition').lower().strip()
         level = request.form.get('level').lower().strip()
+        user_id = session.get('user_id')
         category = request.form.get('cat_id')
+
         category = category.split(", ")
         cat_id = category[0]
-        put_data('INSERT INTO maori_words (Maori, English, Definition, level, cat_id) VALUES (?,?,?,?,?)', (mao_word, eng_word, deff, level, cat_id, ))
+        put_data('INSERT INTO maori_words (Maori, English, Definition, level, cat_id_fk,user_id_fk ) VALUES (?,?,?,?,?,?)', (mao_word, eng_word, deff, level, cat_id, user_id,))
 
 
     return redirect('/admin')
@@ -312,7 +315,8 @@ def render_search():
 
 @app.route('/allwords_table')
 def table():
-    query = "SELECT word_id, Maori, English, Definition, level, image FROM maori_words "
+    query = ("SELECT word_id, Maori, English, Definition, level, image, category_name FROM maori_words m "
+             "INNER JOIN category c ON m.cat_id_fk = c.cat_id")
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query, )
