@@ -1,5 +1,6 @@
 from idlelib import query
 from flask import Flask, render_template, redirect, request, session
+import os
 import sqlite3
 from sqlite3 import Error
 from flask_bcrypt import Bcrypt
@@ -8,6 +9,10 @@ DATABASE = "C:/Users/Admin/OneDrive - Wellington College/Dictionary-Maori/Maori.
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "qwertyuiop"
+
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 def get_list(query, params):
     con = create_connection(DATABASE)
@@ -326,6 +331,25 @@ def table():
     print(words_list)
 
     return render_template("allwords_table.html", word=words_list, logged_in=is_logged_in())
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            filename = file.filename
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            # Save the file_path to your database
+            # For SQLite, you can use an ORM like SQLAlchemy or execute SQL queries directly
+            # Example with SQLAlchemy:
+            # image = Image(path=file_path)
+            # db.session.add(image)
+            # db.session.commit()
+            return 'File uploaded successfully'
+    return render_template('upload.html')
+
+
 
 if __name__ == '__main__':
     app.run()

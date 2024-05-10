@@ -44,6 +44,11 @@
             </select>
         </div>
     </div>
+    <h1>Upload Image</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <button type="submit">Upload</button>
+    </form>
     <div class="form-group">
         <div class="form-label"></div>
         <div class="form-element"><input type="submit" value="Add Word"></div>
