@@ -4,6 +4,7 @@ import os
 import sqlite3
 from sqlite3 import Error
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 DATABASE = "C:/Users/Admin/OneDrive - Wellington College/Dictionary-Maori/Maori.db"
 app = Flask(__name__)
@@ -169,7 +170,9 @@ def render_category(cat_id):
     category_list = cur.fetchall()
     print(category_list)
     con.close()
-    query = "SELECT word_id, Maori, English, Definition, level, image FROM maori_words "
+    query = ("SELECT word_id, Maori, English, Definition, level, image, category_name, fname FROM maori_words m "
+             "INNER JOIN user u on m.user_id_fk = u.user_id "
+             "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE cat_id=? ")
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query, (cat_id,))
@@ -179,14 +182,14 @@ def render_category(cat_id):
 
     return render_template("category.html", word=words_list, categories=category_list, logged_in=is_logged_in(), title=title)
 
-@app.route('/word_detail/<id>')
-def render_word_detail(id):
-    query = ("SELECT Maori, English, Definition, level, image, category_name, fname FROM maori_words m "
+@app.route('/word_detail/<word_id>')
+def render_word_detail(word_id):
+    query = ("SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM maori_words m "
              "INNER JOIN user u on m.user_id_fk = u.user_id "
              "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?")
     con = create_connection(DATABASE)
     cur = con.cursor()
-    cur.execute(query, (id,))
+    cur.execute(query, (word_id,))
     about_word = cur.fetchall()
     con.close()
     return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in())
@@ -246,11 +249,12 @@ def add_word():
         deff = request.form.get('Definition').lower().strip()
         level = request.form.get('level').lower().strip()
         user_id = session.get('user_id')
+        date_added = datetime.today().strftime('%Y-%m-%d')
         category = request.form.get('cat_id')
         image = "noimage"
         category = category.split(", ")
         cat_id = category[0]
-        put_data('INSERT INTO maori_words (Maori, English, Definition, level, image, cat_id_fk,user_id_fk ) VALUES (?,?,?,?,?,?, ?)', (mao_word, eng_word, deff, level, image, cat_id, user_id,))
+        put_data('INSERT INTO maori_words (Maori, English, Definition, level, image, cat_id_fk, entry_date, user_id_fk ) VALUES (?,?,?,?,?,?,?,?)', (mao_word, eng_word, deff, level, image, cat_id, date_added, user_id,))
 
 
     return redirect('/admin')
@@ -321,6 +325,12 @@ def render_search():
 
 @app.route('/allwords_table')
 def table():
+    query = "SELECT cat_id, category_name FROM category"
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query)
+    category_list = cur.fetchall()
+    con.close()
     query = ("SELECT word_id, Maori, English, Definition, level, image, category_name FROM maori_words m "
              "INNER JOIN category c ON m.cat_id_fk = c.cat_id")
     con = create_connection(DATABASE)
@@ -330,7 +340,7 @@ def table():
     con.close()
     print(words_list)
 
-    return render_template("allwords_table.html", word=words_list, logged_in=is_logged_in())
+    return render_template("allwords_table.html", word=words_list, logged_in=is_logged_in(), categories=category_list)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
@@ -340,12 +350,6 @@ def upload_file():
             filename = file.filename
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
-            # Save the file_path to your database
-            # For SQLite, you can use an ORM like SQLAlchemy or execute SQL queries directly
-            # Example with SQLAlchemy:
-            # image = Image(path=file_path)
-            # db.session.add(image)
-            # db.session.commit()
             return 'File uploaded successfully'
     return render_template('upload.html')
 
