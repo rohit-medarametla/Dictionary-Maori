@@ -40,13 +40,13 @@ h2 {
 }
 
 nav {
-    background-color: rgb(196, 14, 14); /* darkest blue */
+    background-color: rgb(0, 0, 0); /* darkest blue */
     text-align: center;
     /*color: rgba(52, 152, 219, 1.0);!*light blue*!*/
     font-size: 1.5rem;
     padding-top: 0.4rem;
     padding-bottom: 0.7rem;
-    color: rgb(255, 255, 255); /*light blue*/
+    color: rgb(196, 14, 14); /*light blue*/
 }
 
 .navbar-brand {
@@ -63,27 +63,27 @@ nav a {
     /*margin:0 0.5rem;*/
     padding: 0 0.5rem;
     font-size: 1.5rem;
+    color: red;
 
     /*border: 1px solid rgba(52, 152, 219, 1.0);*/
     /*border-radius:0.5rem;*/
 }
 
 nav a:hover {
-    /*color: rgba(44, 62, 80, 1.0); !* darkest blue *!*/
-    /*background-color: rgba(52, 152, 219, 1.0); !*light blue*!*/
-    border-bottom: 3px solid rgb(255, 255, 255);
+
+    border-bottom: 3px solid rgb(196, 14, 14);
 }
 
-a, a:visited {
-    color: rgb(255, 255, 255);
-    /*color:hotpink;*/
-    text-decoration: none;
+
+.navbar-links a:hover {
+    border-bottom: 1px solid #b20000;
 }
 
 .category-menu {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
+
 }
 
 .category-item {

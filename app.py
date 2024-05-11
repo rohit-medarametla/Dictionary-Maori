@@ -59,6 +59,7 @@ def is_teacher():
         return True
 
 
+
 @app.route('/')
 def render_home():  # put application's code here
     return render_template('home.html', logged_in = is_logged_in())
@@ -174,7 +175,7 @@ def logout():
     return redirect('/?message=See+you+next+time!')
 @app.route('/admin')
 def render_admin():
-    if is_logged_in():
+    if is_logged_in and is_teacher():
         category_list = get_list("SELECT * FROM category", "")
         word_d = get_list("SELECT word_id, English FROM maori_words", "")
     else:
