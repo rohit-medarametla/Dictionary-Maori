@@ -1,5 +1,5 @@
 from idlelib import query
-from flask import Flask, render_template, redirect, request, session
+from flask import Flask, render_template, redirect, request, session, url_for
 import os
 import sqlite3
 from sqlite3 import Error
@@ -15,17 +15,17 @@ UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
+
 def get_list(query, params):
     con = create_connection(DATABASE)
     cur = con.cursor()
     if params == "":
         cur.execute(query)
-
     else:
         cur.execute(query, params)
     query_list = cur.fetchall()
     con.close()
-    return query_list,
+    return query_list
 
 def put_data(query, params):
     con = create_connection(DATABASE)
@@ -61,13 +61,6 @@ def is_teacher():
 
 @app.route('/')
 def render_home():  # put application's code here
-    con = create_connection(DATABASE)
-    query = ("SELECT Maori, English, Definition, level, image FROM maori_words")
-    cur = con.cursor()
-    cur.execute(query)
-    words_list = cur.fetchall()
-    con.close()
-    print(words_list)
     return render_template('home.html', logged_in = is_logged_in())
 
 
@@ -109,13 +102,14 @@ def render_login():
     if request.method == 'POST':
         email = request.form['email'].strip().lower()
         password = request.form['password'].strip()
-        query = """SELECT user_id, fname, password, is_teacher FROM user WHERE email= ?"""
+        query = "SELECT user_id, fname, password, is_teacher FROM user WHERE email= ?"
         con = create_connection(DATABASE)
         cur = con.cursor()
         cur.execute(query, (email,))
         user_data = cur.fetchone()
         print(user_data)
         con.close()
+
         if user_data == None:
              redirect(request.referrer + '?error=Invalid+username+or+password')
         else:
@@ -141,23 +135,10 @@ def render_login():
 
 @app.route('/allwords')
 def render_all_words():
-    query = "SELECT * FROM category"
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query)
-    category_list = cur.fetchall()
-    con.close()
-    query = ("SELECT Maori, English, Definition, level, image, category_name, fname FROM maori_words m "
+    category_list = get_list("SELECT * FROM category", "")
+    words_list = get_list("SELECT Maori, English, Definition, level, image, category_name, fname FROM maori_words m "
              "INNER JOIN user u on m.user_id_fk = u.user_id "
-             "INNER JOIN category c ON m.cat_id_fk = c.cat_id  ")
-
-    #query = "SELECT id, Maori, English, Definition, level, image FROM maori_words "
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query )
-    words_list = cur.fetchall()
-    print(words_list)
-    con.close()
+             "INNER JOIN category c ON m.cat_id_fk = c.cat_id ", "")
 
     return render_template("allwords.html", word=words_list,  logged_in=is_logged_in(), categories=category_list)
 @app.route('/category/<cat_id>')
@@ -254,7 +235,7 @@ def add_word():
         image = "noimage"
         category = category.split(", ")
         cat_id = category[0]
-        put_data('INSERT INTO maori_words (Maori, English, Definition, level, image, cat_id_fk, entry_date, user_id_fk ) VALUES (?,?,?,?,?,?,?,?)', (mao_word, eng_word, deff, level, image, cat_id, date_added, user_id,))
+        put_data('INSERT INTO maori_words (Maori, English, Definition, level, image,  cat_id_fk, entry_date, user_id_fk ) VALUES (?,?,?,?,?,?,?,?)', (mao_word, eng_word, deff, level, image, cat_id, date_added, user_id,))
 
 
     return redirect('/admin')
@@ -344,13 +325,24 @@ def table():
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file:
-            filename = file.filename
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            return 'File uploaded successfully'
+    if 'file' not in request.files:
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        return redirect(request.url)
+    if file:
+        filename = file.filename
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        add_image_to_database(filename)
+        return redirect(url_for('index'))
+
+
+def add_image_to_database(filename):
+    conn = sqlite3.connect('database.db')
+    cur = conn.cursor()
+    cur.execute("INSERT INTO maori_words (image) VALUES (?)", (filename,))
+    conn.commit()
+    conn.close()
     return render_template('upload.html')
 
 
