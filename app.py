@@ -272,7 +272,7 @@ def render_search():
     cur.execute(query, (search, search, search, search, search))
     search_list = cur.fetchall()
     con.close()
-    return render_template("allwords.html", word=search_list, title=title, logged_in=is_logged_in())
+    return render_template("allwords_table.html", word=search_list, title=title, logged_in=is_logged_in())
 
 @app.route('/allwords_table')
 def table():
