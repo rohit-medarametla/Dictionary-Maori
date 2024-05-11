@@ -20,6 +20,12 @@
              <a href="/admin">Admin</a>
               <a href="/allwords_table">Table way</a>
               <a href="/category/<cat_id>">Category</a>
+              <div class="searchbar">
+                <form method="POST" action="/search">
+                <input type="text" name="search" id="search">
+                <input type="submit" value="Search">
+                </form>
+              </div>
             {% else %}
             <a href="/login">login</a>
             {% endif %}

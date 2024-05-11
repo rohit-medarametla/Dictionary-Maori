@@ -264,15 +264,15 @@ def delete_word_confirm(word_id):
 def render_search():
     search = request.form['search']
     title = "Search for " + search
-    query = "SELECT id, Maori, English, definition, level  FROM maori_words WHERE " \
-            "id like ? or Maori like ? OR English like ? OR definition like ? OR level like ? "
+    query = "SELECT word_id, Maori, English, definition, level  FROM maori_words WHERE " \
+            "word_id like ? or Maori like ? OR English like ? OR definition like ? OR level like ? "
     search = "%" + search + "%"
     con = create_connection(DATABASE)
     cur = con.cursor()
     cur.execute(query, (search, search, search, search, search))
     search_list = cur.fetchall()
     con.close()
-    return render_template("allwords.html", find=search_list, title=title)
+    return render_template("allwords.html", word=search_list, title=title, )
 
 @app.route('/allwords_table')
 def table():
