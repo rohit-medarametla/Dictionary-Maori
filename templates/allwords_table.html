@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block main %}
+<h2> {{ title }} </h2>
     <div class="category-menu">
         {% for category in categories %}
         <div class="category-item"><h2><a href="/category/{{ category[0] }}">{{ category[1] }}
@@ -27,7 +28,7 @@
         <td>{{ id[1] }}</td>
         <td><a href="/word_detail/{{ id[0] }}">{{ id[2] }}</a></td>
         <td>{{ id[4] }}</td>
-        <td>{{ id[6] }}</td>
+        <td>{{ id[5] }}</td>
         </tr>
         {% endfor %}
     </table>

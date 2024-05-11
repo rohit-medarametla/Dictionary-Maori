@@ -263,13 +263,14 @@ def delete_word_confirm(word_id):
 @app.route('/search', methods=['GET', 'POST'])
 def render_search():
     search = request.form['search']
-    title = "Search for " + search
-    query = "SELECT word_id, Maori, English, definition, level  FROM maori_words WHERE " \
-            "word_id like ? or Maori like ? OR English like ? OR definition like ? OR level like ? "
+    title = "Search results for: " + search
+    query = ("SELECT word_id, Maori, English, definition, level, category_name  FROM maori_words m INNER JOIN category c ON m.cat_id_fk = c.cat_id "
+             "WHERE " 
+            "word_id like ? or Maori like ? OR English like ? OR definition like ? OR level like ? OR category_name like ? ")
     search = "%" + search + "%"
     con = create_connection(DATABASE)
     cur = con.cursor()
-    cur.execute(query, (search, search, search, search, search))
+    cur.execute(query, (search, search, search, search, search, search))
     search_list = cur.fetchall()
     con.close()
     return render_template("allwords_table.html", word=search_list, title=title, logged_in=is_logged_in())
@@ -282,7 +283,7 @@ def table():
     cur.execute(query)
     category_list = cur.fetchall()
     con.close()
-    query = ("SELECT word_id, Maori, English, Definition, level, image, category_name FROM maori_words m "
+    query = ("SELECT word_id, Maori, English, Definition, level, category_name, image  FROM maori_words m "
              "INNER JOIN category c ON m.cat_id_fk = c.cat_id")
     con = create_connection(DATABASE)
     cur = con.cursor()
