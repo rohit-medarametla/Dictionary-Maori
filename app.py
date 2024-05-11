@@ -144,23 +144,12 @@ def render_all_words():
 @app.route('/category/<cat_id>')
 def render_category(cat_id):
     title = cat_id
-    query = "SELECT * FROM category"
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query)
-    category_list = cur.fetchall()
+    category_list = get_list("SELECT * FROM category", "")
     print(category_list)
-    con.close()
-    query = ("SELECT word_id, Maori, English, Definition, level, image, category_name, fname FROM maori_words m "
-             "INNER JOIN user u on m.user_id_fk = u.user_id "
-             "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE cat_id=? ")
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query, (cat_id,))
-    words_list = cur.fetchall()
-    con.close()
+    words_list = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname FROM maori_words m "
+                          "INNER JOIN user u on m.user_id_fk = u.user_id "
+                          "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE cat_id=?", (cat_id, ))
     print(words_list)
-
     return render_template("category.html", word=words_list, categories=category_list, logged_in=is_logged_in(), title=title)
 
 @app.route('/word_detail/<word_id>')
@@ -186,29 +175,10 @@ def logout():
 @app.route('/admin')
 def render_admin():
     if is_logged_in():
-        query1 = "SELECT * FROM category"
-        con = create_connection(DATABASE)
-        cur = con.cursor()
-        cur.execute(query1)
-        category_list = cur.fetchall()
-        con.close()
-
-        query2 = "SELECT word_id, English FROM maori_words"
-        con = create_connection(DATABASE)
-        cur = con.cursor()
-        print(f'query = {query2}')
-        cur.execute(query2)
-        word_d = cur.fetchall()
-        print(word_d)
-        con.close()
-
-        # category_list = get_list("SELECT * FROM category", "")
-
-        print(f'you are at the end of admin rendering')
+        category_list = get_list("SELECT * FROM category", "")
+        word_d = get_list("SELECT word_id, English FROM maori_words", "")
     else:
         return redirect('/?message=Need+to+be+logged+in.')
-
-
     return render_template("admin.html", logged_in=is_logged_in(), is_teacher=is_teacher(), categories=category_list, word_de=word_d)
 
 @app.route('/add_category', methods=['POST'])
@@ -259,7 +229,7 @@ def delete_category_confirm(category_id):
     if not is_logged_in():
         return redirect('/?message=Need+tobe+logged+in.')
     con = create_connection(DATABASE)
-    query = 'DELETE FROM category WHERE id = ?'
+    query = 'DELETE FROM category WHERE cat_id = ?'
     cur = con.cursor()
     cur.execute(query, (category_id,))
     con.commit()
@@ -278,14 +248,14 @@ def render_delete_word():
         return render_template("delete_confirm1.html", id=id1, name=name_s, type="word", logged_in=is_logged_in(), is_teacher=is_teacher())
     return redirect('/admin')
 
-@app.route('/delete_word_confirm/<id>')
-def delete_word_confirm(id):
+@app.route('/delete_word_confirm/<word_id>')
+def delete_word_confirm(word_id):
     if not is_logged_in():
-        return redirect('/?message=Need+tobe+logged+in.')
+        return redirect('/?message=Need+to+be+logged+in.')
     con = create_connection(DATABASE)
-    query = 'DELETE FROM maori_words WHERE id = ?'
+    query = 'DELETE FROM maori_words WHERE word_id = ?'
     cur = con.cursor()
-    cur.execute(query, (id,))
+    cur.execute(query, (word_id,))
     con.commit()
     con.close()
     return redirect('/admin')
