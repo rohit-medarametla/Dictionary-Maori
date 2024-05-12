@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block pageheading %}{% if word_de == None %}Add{% else %}Edit{% endif %} word{% endblock %}
+
+{% block main %}
+<form class="myform" method="post" >
+    <div class="form-group">
+        <div class="form-label"><label for="Maori"> Maori word name</label> </div>
+        <div class="form-element"><input type="text" name="Maori" id="Maori" {% if word_de != None %} value="{{ word_de[1] }}" {% endif %} required></div>
+    </div>
+    <div class="form-group">
+        <div class="form-label"><label for="English"> English word name</label> </div>
+        <div class="form-element"><input type="text" name="English" id="English" {% if word_de != None %} value="{{ word_de[2] }}" {% endif %} required></div>
+    </div>
+    <div class="form-group">
+        <div class="form-label"><label for="Definition"> Word definition</label> </div>
+        <div class="form-element"><input type="text" name="Definition" id="Definition" {% if word_de != None %} value="{{ word_de[3] }}" {% endif %} required></div>
+    </div>
+    <div class="form-group">
+        <div class="form-label"><label for="level"> Word level</label> </div>
+        <div class="form-element"><input type="text" name="level" id="level" {% if word_de != None %} value="{{ word_de[4] }}" {% endif %} required></div>
+    </div>
+    <div class="form-group">
+        <div class="form-label"><label for="name">Category Name:</label></div>
+        <div class="form-element">
+            <select id="cat_id" name="cat_id">
+
+                    <option {% if word_de != None %} value="{{ word_de[6] }}" {% endif %} >{{ word_de[6] }} </option>
+
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-label"></div>
+        <div class="form-element"><input type="submit" value="Edit word"></div>
+    </div>
+</form>
+
+
+
+
+{% endblock %}

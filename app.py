@@ -208,8 +208,31 @@ def add_word():
         cat_id = category[0]
         put_data('INSERT INTO maori_words (Maori, English, Definition, level, image,  cat_id_fk, entry_date, user_id_fk ) VALUES (?,?,?,?,?,?,?,?)', (mao_word, eng_word, deff, level, image, cat_id, date_added, user_id,))
 
-
     return redirect('/admin')
+
+@app.route('/edit/<word_id>', methods=['GET', 'POST'])
+def edit_word(word_id):
+    if request.method == "POST":
+        mao_word = request.form.get('Maori').lower().strip()
+        eng_word = request.form.get('English').lower().strip()
+        deff = request.form.get('Definition').lower().strip()
+        level = request.form.get('level').lower().strip()
+        user_id = session.get('user_id')
+        date_added = datetime.today().strftime('%Y-%m-%d')
+        category = request.form.get('cat_id')
+
+        put_data("UPDATE maori_words SET Maori=?, English=?, Definition=?, level=?, last_edit_by=?, entry_date=? WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, category))
+    about_word = get_list(
+        "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM maori_words m "
+        "INNER JOIN user u on m.user_id_fk = u.user_id "
+        "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
+
+    return render_template('edit.html', logged_in=is_logged_in(),  word_de=about_word)
+
+
+
+
+
 
 
 
