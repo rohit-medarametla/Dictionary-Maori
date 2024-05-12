@@ -16,6 +16,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 
+# this is a function that creates connection with database and queries what we want and store it in a variable
 def get_list(query, params):
     con = create_connection(DATABASE)
     cur = con.cursor()
@@ -217,6 +218,7 @@ def edit_word(word_id):
         category = request.form.get('cat_id')
 
         put_data("UPDATE maori_words SET Maori=?, English=?, Definition=?, level=?, last_edit_by=?, entry_date=? WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, category))
+        flash("The word has been updated!", "info")
     about_word = get_list(
         "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM maori_words m "
         "INNER JOIN user u on m.user_id_fk = u.user_id "
@@ -292,9 +294,9 @@ def render_search():
     cur.execute(query, (search, search, search, search, search, search))
     search_list = cur.fetchall()
     con.close()
-    return render_template("allwords_table.html", word=search_list, title=title, logged_in=is_logged_in())
+    return render_template("allwords.html", word=search_list, title=title, logged_in=is_logged_in())
 
-@app.route('/allwords_table')
+@app.route('/allwords')
 def table():
     query = "SELECT cat_id, category_name FROM category"
     con = create_connection(DATABASE)
@@ -311,7 +313,7 @@ def table():
     con.close()
     print(words_list)
 
-    return render_template("allwords_table.html", word=words_list, logged_in=is_logged_in(), categories=category_list)
+    return render_template("allwords.html", word=words_list, logged_in=is_logged_in(), categories=category_list)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():

@@ -291,3 +291,26 @@ td, th {
   background-color: #646464;
   color: white;
 }
+
+
+
+.collapsible_header{
+  background-color: #646464;
+  color: white;
+  padding: 10px;
+}
+
+.collapsible {
+  background-color: #f2f2f2;
+  cursor: pointer;
+  padding-bottom: 5px;
+  width: 100%;
+  outline: none;
+  border: none;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.active, .collapsible:hover {
+  background-color: #dddddd;
+}
