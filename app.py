@@ -1,5 +1,5 @@
 from idlelib import query
-from flask import Flask, render_template, redirect, request, session, url_for
+from flask import Flask, render_template, redirect, request, session, url_for, flash
 import os
 import sqlite3
 from sqlite3 import Error
@@ -134,12 +134,7 @@ def render_login():
 
     return render_template('login.html',  logged_in=is_logged_in())
 
-@app.route('/allwords')
-def render_all_words():
-    category_list = get_list("SELECT * FROM category", "")
-    words_list = get_list("SELECT Maori, English, Definition, level, image, category_name, fname FROM maori_words m "
-             "INNER JOIN user u on m.user_id_fk = u.user_id "
-             "INNER JOIN category c ON m.cat_id_fk = c.cat_id ", "")
+
 
     return render_template("allwords.html", word=words_list,  logged_in=is_logged_in(), categories=category_list)
 @app.route('/category/<cat_id>')
@@ -225,7 +220,7 @@ def edit_word(word_id):
     about_word = get_list(
         "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM maori_words m "
         "INNER JOIN user u on m.user_id_fk = u.user_id "
-        "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
+        "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))[0]
 
     return render_template('edit.html', logged_in=is_logged_in(),  word_de=about_word)
 
