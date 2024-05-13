@@ -8,7 +8,7 @@
 body {
     width: 100vw;
     height: 100vh;
-    background-image: url("C:/Users/Admin/OneDrive - Wellington College/Dictionary-Maori/static/images/maoribackground.jpg");
+    background-image: url("../static/images/maoribackground.jpg");
     background-size: cover;
 }
 
@@ -48,7 +48,7 @@ nav {
     /*color: rgba(52, 152, 219, 1.0);!*light blue*!*/
     font-size: 1.5rem;
     padding-top: 0.4rem;
-    padding-bottom: 0.7rem;
+    padding-left: 0.7rem;
     color: rgb(196, 14, 14); /*light blue*/
 }
 
@@ -84,6 +84,7 @@ nav a:hover {
 
 .category-menu {
     display: flex;
+    float: left;
     flex-wrap: wrap;
     justify-content: space-evenly;
 
