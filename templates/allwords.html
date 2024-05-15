@@ -14,12 +14,14 @@
 <h2> {{ title }} </h2>
 
     <div class="sidebar">
+        <p>Categories</p>
         {% for category in categories %}
-        <div class="category-item"><h2><a href="/category/{{ category[0] }}">{{ category[1] }}
-         </a> </h2></div>
+            <ul id="sidebar-links">
+                <li> <a href="/category/{{ category[0] }}">{{ category[1] }}</a> </li>
+            </ul>
         {% endfor %}
     </div>
-
+    <div class="content">
     <table class="list">
 
         <tr>
@@ -40,7 +42,8 @@
         </tr>
         {% endfor %}
     </table>
-
+    </div>
+    <script src="script.js"></script>
 
 
 {% endblock %}

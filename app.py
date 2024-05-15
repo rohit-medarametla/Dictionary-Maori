@@ -96,6 +96,8 @@ def render_signup():
             (fname, lname, email, hashed_password, teacher, year_group, class_name))
         except sqlite3.IntegrityError:
             return redirect('\signup?error=Email+is+already+used')
+        except sqlite3.OperationalError:
+            return redirect('/signup?error=database+is+locked')
         return redirect("\login")
     return render_template('signup.html', logged_in=is_logged_in(), is_teacher=is_teacher())
 
@@ -152,6 +154,7 @@ def render_category(cat_id):
 
 @app.route('/word_detail/<word_id>')
 def render_word_detail(word_id):
+    category_list = get_list("SELECT cat_id, category_name FROM category", "")
     query = ("SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM maori_words m "
              "INNER JOIN user u on m.user_id_fk = u.user_id "
              "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?")
@@ -160,7 +163,7 @@ def render_word_detail(word_id):
     cur.execute(query, (word_id,))
     about_word = cur.fetchall()
     con.close()
-    return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in())
+    return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in(), categories=category_list)
 
 
 
@@ -302,12 +305,7 @@ def render_search():
 
 @app.route('/allwords')
 def table():
-    query = "SELECT cat_id, category_name FROM category"
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query)
-    category_list = cur.fetchall()
-    con.close()
+    category_list = get_list("SELECT cat_id, category_name FROM category","")
     query = ("SELECT word_id, Maori, English, Definition, level, category_name, image  FROM maori_words m "
              "INNER JOIN category c ON m.cat_id_fk = c.cat_id")
     con = create_connection(DATABASE)
