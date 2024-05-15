@@ -18,23 +18,20 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # this is a function that creates connection with database and queries what we want and store it in a variable
 def get_list(query, params):
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    if params == "":
-        cur.execute(query)
-    else:
-        cur.execute(query, params)
-    query_list = cur.fetchall()
-    con.close()
-    print(query_list)
+    with create_connection(DATABASE) as con:
+        cur = con.cursor()
+        if params == "":
+            cur.execute(query)
+        else:
+            cur.execute(query, params)
+        query_list = cur.fetchall()
     return query_list
 
 def put_data(query, params):
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query, params)
-    con.commit()
-    con.close()
+    with create_connection(DATABASE) as con:
+        cur = con.cursor()
+        cur.execute(query, params)
+        con.commit()
 
 
 def create_connection(db_file):
@@ -212,7 +209,14 @@ def add_word():
 
 @app.route('/edit/<word_id>', methods=['GET', 'POST'])
 def edit_word(word_id):
+    about_word = get_list(
+        "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM maori_words m "
+        "INNER JOIN user u on m.user_id_fk = u.user_id "
+        "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
+    about_word = about_word[0]
+    print(about_word)
     if request.method == "POST":
+
         mao_word = request.form.get('Maori').lower().strip()
         eng_word = request.form.get('English').lower().strip()
         deff = request.form.get('Definition').lower().strip()
@@ -221,22 +225,15 @@ def edit_word(word_id):
         date_added = datetime.today().strftime('%Y-%m-%d')
         category = request.form.get('cat_id')
 
-        put_data("UPDATE maori_words SET Maori=?, English=?, Definition=?, level=?, last_edit_by=?, entry_date=? WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, category))
+        put_data("UPDATE maori_words SET"
+                 " Maori=?, English=?, Definition=?, level=?, last_edit_by=?, entry_date=? "
+                 "WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, word_id))
         flash("The word has been updated!", "info")
         return redirect('/allwords')
 
-    about_word = get_list(
-        "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM maori_words m "
-        "INNER JOIN user u on m.user_id_fk = u.user_id "
-        "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
-    about_word = about_word[0]
+
 
     return render_template('edit.html', logged_in=is_logged_in(),  word_de=about_word, word_id=word_id)
-
-
-
-
-
 
 
 
