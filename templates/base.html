@@ -10,7 +10,7 @@
 </head>
 <body>
 <nav>
-    <div class="container">
+        <div class="container">
         <div class="navbar-brand">dictionary.</div>
         <div class="navbar-links">
             <a href="/">home</a>
@@ -19,18 +19,14 @@
             <a href="/allwords">All words </a>
              <a href="/admin">Admin</a>
               <a href="/category/<cat_id>">Category</a>
-              <div class="searchbar">
-                <form method="POST" action="/search">
-                <input type="text" name="search" id="search">
-                <input type="submit" value="Search">
-                </form>
-              </div>
+
             {% else %}
             <a href="/login">login</a>
             {% endif %}
         </div>
     </div>
 </nav>
+
 
 </nav>
 <div class="container">
@@ -41,7 +37,9 @@
 
     <main>
         {% block main %}
+
         {% endblock %}
+
     </main>
 </div>
 </body>

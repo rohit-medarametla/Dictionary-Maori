@@ -6,10 +6,7 @@
 }
 
 body {
-    width: 100vw;
-    height: 100vh;
     background-color: indianred;
-    background-size: cover;
 }
 
 .container {
@@ -48,8 +45,8 @@ nav {
     /*color: rgba(52, 152, 219, 1.0);!*light blue*!*/
     font-size: 1.5rem;
     padding-top: 0.4rem;
-    padding-left: 0.7rem;
-    color: rgb(196, 14, 14); /*light blue*/
+    padding-bottom: 0.7rem;
+     color: rgb(196, 14, 14); /*light blue*/
 }
 
 .navbar-brand {
@@ -66,28 +63,27 @@ nav a {
     /*margin:0 0.5rem;*/
     padding: 0 0.5rem;
     font-size: 1.5rem;
-    color: red;
 
     /*border: 1px solid rgba(52, 152, 219, 1.0);*/
     /*border-radius:0.5rem;*/
 }
 
 nav a:hover {
-
-    border-bottom: 3px solid rgb(196, 14, 14);
+    /*color: rgba(44, 62, 80, 1.0); !* darkest blue *!*/
+    /*background-color: rgba(52, 152, 219, 1.0); !*light blue*!*/
+    border-bottom: 3px solid rgb(213, 4, 4);
 }
 
-
-.navbar-links a:hover {
-    border-bottom: 1px solid #b20000;
+a, a:visited {
+    color: rgb(253, 0, 0);
+    /*color:hotpink;*/
+    text-decoration: none;
 }
 
 .category-menu {
     display: flex;
-    float: left;
     flex-wrap: wrap;
     justify-content: space-evenly;
-
 }
 
 .category-item {
@@ -294,24 +290,32 @@ td, th {
 }
 
 
-
-.collapsible_header{
-  background-color: #646464;
-  color: white;
-  padding: 10px;
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px; /* Adjust the width as needed */
+    height: 100%; /* Make sidebar full height */
+    background-color: #f0f0f0; /* Change as needed */
+    padding-top: 20px;
 }
 
-.collapsible {
-  background-color: #f2f2f2;
-  cursor: pointer;
-  padding-bottom: 5px;
-  width: 100%;
-  outline: none;
-  border: none;
-  margin-top: 5px;
-  margin-bottom: 5px;
+/* Style for the links */
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
 }
 
-.active, .collapsible:hover {
-  background-color: #dddddd;
+.sidebar ul li {
+    padding: 10px;
+}
+
+.sidebar ul li a {
+    text-decoration: none;
+    color: #333; /* Link color */
+    display: block;
+}
+
+.sidebar ul li a:hover {
+    background-color: #ddd; /* Hover color */
 }

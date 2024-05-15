@@ -26,6 +26,7 @@ def get_list(query, params):
         cur.execute(query, params)
     query_list = cur.fetchall()
     con.close()
+    print(query_list)
     return query_list
 
 def put_data(query, params):
@@ -219,12 +220,15 @@ def edit_word(word_id):
 
         put_data("UPDATE maori_words SET Maori=?, English=?, Definition=?, level=?, last_edit_by=?, entry_date=? WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, category))
         flash("The word has been updated!", "info")
+        return redirect('/allwords')
+
     about_word = get_list(
         "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM maori_words m "
         "INNER JOIN user u on m.user_id_fk = u.user_id "
-        "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))[0]
+        "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
+    about_word = about_word[0]
 
-    return render_template('edit.html', logged_in=is_logged_in(),  word_de=about_word)
+    return render_template('edit.html', logged_in=is_logged_in(),  word_de=about_word, word_id=word_id)
 
 
 

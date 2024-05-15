@@ -3,7 +3,7 @@
 {% block pageheading %}{% if word_de == None %}Add{% else %}Edit{% endif %} word{% endblock %}
 
 {% block main %}
-<form class="myform" method="post" action="/edit/<word_id>" >
+<form class="myform" method="post" action="/edit/{{ word_id }}" >
     <div class="form-group">
         <div class="form-label"><label for="Maori"> Maori word name</label> </div>
         <div class="form-element"><input type="text" name="Maori" id="Maori" {% if word_de != None %} value="{{ word_de[1] }}" {% endif %} required></div>

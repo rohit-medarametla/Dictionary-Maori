@@ -5,11 +5,18 @@
 {% endblock %}
 
 {% block main %}
+    <div class="searchbar">
+                <form method="POST" action="/search">
+                <input type="text" name="search" id="search">
+                <input type="submit" value="Search">
+                </form>
+              </div>
 <h2> {{ title }} </h2>
-    <div class="category-menu">
+
+    <div class="sidebar">
         {% for category in categories %}
         <div class="category-item"><h2><a href="/category/{{ category[0] }}">{{ category[1] }}
-         </a></h2></div>
+         </a> </h2></div>
         {% endfor %}
     </div>
 
