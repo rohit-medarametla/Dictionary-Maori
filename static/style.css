@@ -63,6 +63,7 @@ nav a {
     /*margin:0 0.5rem;*/
     padding: 0 0.5rem;
     font-size: 1.5rem;
+    color: red;
 
     /*border: 1px solid rgba(52, 152, 219, 1.0);*/
     /*border-radius:0.5rem;*/
@@ -74,11 +75,7 @@ nav a:hover {
     border-bottom: 3px solid rgb(213, 4, 4);
 }
 
-a, a:visited {
-    color: rgb(253, 0, 0);
-    /*color:hotpink;*/
-    text-decoration: none;
-}
+
 
 .category-menu {
     display: flex;
@@ -296,8 +293,9 @@ td, th {
     left: 0px;
     width: 200px; /* Adjust the width as needed */
     height: auto; /* Make sidebar full height */
-    background-color: white;
+    background-color: indianred;
     padding-top: 20px;
+    border: 3px solid #ffffff;
 
 }
 
