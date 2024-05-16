@@ -303,13 +303,8 @@ def render_search():
 @app.route('/allwords')
 def table():
     category_list = get_list("SELECT cat_id, category_name FROM category","")
-    query = ("SELECT word_id, Maori, English, Definition, level, category_name, image  FROM maori_words m "
-             "INNER JOIN category c ON m.cat_id_fk = c.cat_id")
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query, )
-    words_list = cur.fetchall()
-    con.close()
+    words_list = get_list("SELECT word_id, Maori, English, Definition, level, category_name, image  FROM maori_words m "
+             "INNER JOIN category c ON m.cat_id_fk = c.cat_id", "")
     print(words_list)
 
     return render_template("allwords.html", word=words_list, logged_in=is_logged_in(), categories=category_list)

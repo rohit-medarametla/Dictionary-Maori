@@ -5,29 +5,37 @@
 {% endblock %}
 
 {% block main %}
-    <div class="category-menu">
+     <div class="sidebar">
+        <p>Categories</p>
         {% for category in categories %}
-        <div class="category-item"><h2><a href="/category/{{ category[0] }}">{{ category[1] }}
-         </a></h2></div>
+            <ul id="sidebar-links">
+                <li> <a href="/category/{{ category[0] }}">{{ category[1] }}</a> </li>
+            </ul>
         {% endfor %}
     </div>
 
-    <div class="products">
-        {% for id in word %}
-        <div class="product-box">
-            <div class="product-box-heading">
-                <h2><a href="/word_detail/{{ id[0] }}">{{ id[2] }}</a></h2>
-            </div>
-            <div class = "product-box-image">
-                <img src ="/static/images/{{ id[5] }}.jpg">
-            </div>
-            <div class="product-box-info">
-                <p><strong>English:</strong> {{ id[2] }}</p>
-                <p><strong>Maori:</strong> {{ id[1] }}</p>
-            </div>
+    <div class="content">
+    <table class="list">
 
+        <tr>
+            <th style="width:35%">Maori Word</th>
+            <th style="width:35%">English Translation</th>
+            <th style="width:15%">Level</th>
+            <th style="width:15%">Category</th>
+
+        </tr>
+
+
+          {% for id in word %}
+         <tr>
+        <td>{{ id[1] }}</td>
+        <td><a href="/word_detail/{{ id[0] }}">{{ id[2] }}</a></td>
+        <td>{{ id[4] }}</td>
+        <td>{{ id[5] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
     </div>
-    {% endfor %}
 
 {% endblock %}
 
