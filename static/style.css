@@ -6,7 +6,7 @@
 }
 
 body {
-    background-color: indianred;
+    background-color: rgba(236, 240, 241, 1.0);
 }
 
 .container {
@@ -40,13 +40,13 @@ h2 {
 }
 
 nav {
-    background-color: rgb(0, 0, 0); /* darkest blue */
+    background-color: rgba(44, 62, 80, 1.0); /* darkest blue */
     text-align: center;
     /*color: rgba(52, 152, 219, 1.0);!*light blue*!*/
     font-size: 1.5rem;
     padding-top: 0.4rem;
     padding-bottom: 0.7rem;
-     color: rgb(196, 14, 14); /*light blue*/
+    color: rgba(52, 152, 219, 1.0); /*light blue*/
 }
 
 .navbar-brand {
@@ -63,7 +63,6 @@ nav a {
     /*margin:0 0.5rem;*/
     padding: 0 0.5rem;
     font-size: 1.5rem;
-    color: red;
 
     /*border: 1px solid rgba(52, 152, 219, 1.0);*/
     /*border-radius:0.5rem;*/
@@ -72,10 +71,14 @@ nav a {
 nav a:hover {
     /*color: rgba(44, 62, 80, 1.0); !* darkest blue *!*/
     /*background-color: rgba(52, 152, 219, 1.0); !*light blue*!*/
-    border-bottom: 3px solid rgb(213, 4, 4);
+    border-bottom: 3px solid rgba(52, 152, 219, 1.0);
 }
 
-
+a, a:visited {
+    color: rgba(52, 152, 219, 1.0);
+    /*color:hotpink;*/
+    text-decoration: none;
+}
 
 .category-menu {
     display: flex;
@@ -284,50 +287,4 @@ td, th {
   text-align: left;
   background-color: #646464;
   color: white;
-}
-
-
-.sidebar {
-    position: fixed;
-    top: 160px;
-    left: 0px;
-    width: 200px; /* Adjust the width as needed */
-    height: auto; /* Make sidebar full height */
-    background-color: indianred;
-    padding-top: 20px;
-    border: 3px solid #ffffff;
-
-}
-
-/* Style for the links */
-.sidebar ul {
-    list-style-type: none;
-    padding: 0;
-
-}
-
-.sidebar ul li {
-    padding: 5px;
-    color: black;
-}
-
-.sidebar ul li a {
-    text-decoration: none;
-    color: #333; /* Link color */
-    display: block;
-}
-
-.sidebar ul li a:hover {
-    background-color: #ddd; /* Hover color */
-}
-
-.sidebar-links {
-    color: black;
-}
-
-
-.dropdown-content{
-    float: none;
-
-
 }

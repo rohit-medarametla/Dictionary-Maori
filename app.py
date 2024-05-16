@@ -89,12 +89,11 @@ def render_signup():
 
         hashed_password = bcrypt.generate_password_hash(password)
         try:
-            put_data("INSERT INTO user (fname, lname, email, password, is_teacher, year_group, class_name) ""VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (fname, lname, email, hashed_password, teacher, year_group, class_name))
+            put_data("INSERT INTO user (fname, lname, email, password, is_teacher ) ""VALUES (?, ?, ?, ?, ?)",
+            (fname, lname, email, hashed_password, teacher))
         except sqlite3.IntegrityError:
             return redirect('\signup?error=Email+is+already+used')
-        except sqlite3.OperationalError:
-            return redirect('/signup?error=database+is+locked')
+
         return redirect("\login")
     return render_template('signup.html', logged_in=is_logged_in(), is_teacher=is_teacher())
 
