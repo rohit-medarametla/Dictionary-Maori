@@ -260,19 +260,18 @@ def delete_category_confirm(category_id):
     con.close()
     return redirect('/admin')
 
-@app.route('/delete_word', methods=['POST'])
-def render_delete_word():
+@app.route('/delete_word/<int:word_id>')
+def render_delete_word(word_id):
     if not is_logged_in():
         return redirect('/?message=Need+to+be+logged+in.')
-    if request.method == "POST":
-        word = request.form.get('word')
-        word = word.split(", ")
-        id1 = word[0]
-        name_s = word[1]
-        return render_template("delete_confirm1.html", id=id1, name=name_s, type="word", logged_in=is_logged_in(), is_teacher=is_teacher())
-    return redirect('/admin')
+    if not is_teacher():
+        return redirect('/')
+    word_info = get_list("SELECT Maori FROM maori_words WHERE word_id = ?", (word_id, ))
 
-@app.route('/delete_word_confirm/<word_id>')
+    return render_template("delete_confirm1.html", id=word_id, name=word_info[0][0], type="word", logged_in=is_logged_in(), is_teacher=is_teacher())
+
+
+@app.route('/delete_word_confirm/<int:word_id>', methods=['POST'])
 def delete_word_confirm(word_id):
     if not is_logged_in():
         return redirect('/?message=Need+to+be+logged+in.')
@@ -282,7 +281,7 @@ def delete_word_confirm(word_id):
     cur.execute(query, (word_id,))
     con.commit()
     con.close()
-    return redirect('/admin')
+    return redirect('/allwords')
 
 @app.route('/search', methods=['GET', 'POST'])
 def render_search():

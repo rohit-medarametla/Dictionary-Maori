@@ -57,9 +57,13 @@
     <tr>
         <td colspan="4"><a href="/edit/{{ id[0] }}">Edit </a> </td>
     </tr>
-    <tr>
-    <td colspan="4"><a href="/dele" </td>
-    </tr>
+        <tr>
+        <td colspan="4"> <form action="/delete_word/{{ id[0] }}" method="GET">
+            <button type="submit">Delete Word</button>
+        </form> </td>
+        </tr>
+
+
     </div>
 
 
