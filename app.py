@@ -57,7 +57,8 @@ def is_teacher():
         print("teacher")
         return True
 
-
+def user_detail():
+    return session
 
 @app.route('/')
 def render_home():  # put application's code here
@@ -138,9 +139,9 @@ def render_login():
 @app.route('/category/<cat_id>')
 def render_category(cat_id):
     title = cat_id
-    category_list = get_list("SELECT * FROM category", "")
+    category_list = get_list("SELECT cat_id, category_name FROM category", "")
     print(category_list)
-    words_list = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname FROM maori_words m "
+    words_list = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname FROM Dictionary m "
                           "INNER JOIN user u on m.user_id_fk = u.user_id "
                           "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE cat_id=?", (cat_id, ))
     print(words_list)
@@ -149,14 +150,9 @@ def render_category(cat_id):
 @app.route('/word_detail/<word_id>')
 def render_word_detail(word_id):
     category_list = get_list("SELECT cat_id, category_name FROM category", "")
-    query = ("SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM maori_words m "
+    about_word = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname, time_added , entry_date FROM Dictionary m "
              "INNER JOIN user u on m.user_id_fk = u.user_id "
-             "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?")
-    con = create_connection(DATABASE)
-    cur = con.cursor()
-    cur.execute(query, (word_id,))
-    about_word = cur.fetchall()
-    con.close()
+             "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
     return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in(), categories=category_list)
 
 
@@ -171,10 +167,10 @@ def logout():
 def render_admin():
     if is_logged_in and is_teacher():
         category_list = get_list("SELECT * FROM category", "")
-        word_d = get_list("SELECT word_id, English FROM maori_words", "")
+        word_detail = get_list("SELECT word_id, English FROM Dictionary", "")
     else:
         return redirect('/?message=Need+to+be+logged+in.')
-    return render_template("admin.html", logged_in=is_logged_in(), is_teacher=is_teacher(), categories=category_list, word_de=word_d)
+    return render_template("admin.html", logged_in=is_logged_in(), is_teacher=is_teacher(), categories=category_list, word_detail=word_detail)
 
 @app.route('/add_category', methods=['POST'])
 def add_category():
@@ -196,11 +192,12 @@ def add_word():
         level = request.form.get('level').lower().strip()
         user_id = session.get('user_id')
         date_added = datetime.today().strftime('%Y-%m-%d')
+        time_added = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         category = request.form.get('cat_id')
         image = "noimage"
         category = category.split(", ")
         cat_id = category[0]
-        put_data('INSERT INTO maori_words (Maori, English, Definition, level, image,  cat_id_fk, entry_date, user_id_fk ) VALUES (?,?,?,?,?,?,?,?)', (mao_word, eng_word, deff, level, image, cat_id, date_added, user_id,))
+        put_data('INSERT INTO Dictionary (Maori, English, Definition, level, image,  cat_id_fk, entry_date, user_id_fk, time_added ) VALUES (?,?,?,?,?,?,?,?,?)', (mao_word, eng_word, deff, level, image, cat_id, date_added, user_id, time_added,))
 
     return redirect('/admin')
 
@@ -208,7 +205,7 @@ def add_word():
 def edit_word(word_id):
     if is_logged_in and is_teacher():
         about_word = get_list(
-            "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM maori_words m "
+            "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date FROM Dictionary m "
             "INNER JOIN user u on m.user_id_fk = u.user_id "
             "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
         about_word = about_word[0]
@@ -223,7 +220,7 @@ def edit_word(word_id):
             date_added = datetime.today().strftime('%Y-%m-%d')
             category = request.form.get('cat_id')
 
-            put_data("UPDATE maori_words SET"
+            put_data("UPDATE Dictionary SET"
                      " Maori=?, English=?, Definition=?, level=?, last_edit_by=?, entry_date=? "
                      "WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, word_id))
             flash("The word has been updated!", "info")
@@ -266,7 +263,7 @@ def render_delete_word(word_id):
         return redirect('/?message=Need+to+be+logged+in.')
     if not is_teacher():
         return redirect('/')
-    word_info = get_list("SELECT Maori FROM maori_words WHERE word_id = ?", (word_id, ))
+    word_info = get_list("SELECT Maori FROM Dictionary WHERE word_id = ?", (word_id, ))
 
     return render_template("delete_confirm1.html", id=word_id, name=word_info[0][0], type="word", logged_in=is_logged_in(), is_teacher=is_teacher())
 
@@ -276,7 +273,7 @@ def delete_word_confirm(word_id):
     if not is_logged_in():
         return redirect('/?message=Need+to+be+logged+in.')
     con = create_connection(DATABASE)
-    query = 'DELETE FROM maori_words WHERE word_id = ?'
+    query = 'DELETE FROM Dictionary WHERE word_id = ?'
     cur = con.cursor()
     cur.execute(query, (word_id,))
     con.commit()
@@ -287,7 +284,7 @@ def delete_word_confirm(word_id):
 def render_search():
     search = request.form['search']
     title = "Search results for: " + search
-    query = ("SELECT word_id, Maori, English, definition, level, category_name  FROM maori_words m INNER JOIN category c ON m.cat_id_fk = c.cat_id "
+    query = ("SELECT word_id, Maori, English, definition, level, category_name  FROM Dictionary m INNER JOIN category c ON m.cat_id_fk = c.cat_id "
              "WHERE " 
             "word_id like ? or Maori like ? OR English like ? OR definition like ? OR level like ? OR category_name like ? ")
     search = "%" + search + "%"
@@ -301,7 +298,7 @@ def render_search():
 @app.route('/allwords')
 def table():
     category_list = get_list("SELECT cat_id, category_name FROM category","")
-    words_list = get_list("SELECT word_id, Maori, English, Definition, level, category_name, image  FROM maori_words m "
+    words_list = get_list("SELECT word_id, Maori, English, Definition, level, category_name, image  FROM Dictionary m "
              "INNER JOIN category c ON m.cat_id_fk = c.cat_id", "")
     print(words_list)
 
@@ -324,7 +321,7 @@ def upload_file():
 def add_image_to_database(filename):
     conn = sqlite3.connect('database.db')
     cur = conn.cursor()
-    cur.execute("INSERT INTO maori_words (image) VALUES (?)", (filename,))
+    cur.execute("INSERT INTO Dictionary (image) VALUES (?)", (filename,))
     conn.commit()
     conn.close()
     return render_template('upload.html')

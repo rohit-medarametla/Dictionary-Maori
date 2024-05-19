@@ -74,7 +74,7 @@
         <div class="form-label"><label for="name">Word Name:</label></div>
         <div class="form-element">
             <select id="word" name="word">
-                {% for English in word_de %}
+                {% for English in word_detail %}
                     <option value="{{ English[0] }}, {{ English[1] }}">{{ English[1] }}</option>
                 {% endfor %}
             </select>
