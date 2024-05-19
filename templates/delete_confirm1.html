@@ -4,8 +4,8 @@
 
 {% block main %}
     <h3>Are you sure you want to delete {{ type }} {{ name }}?
-        <form action="/delete_word_confirm/{{ id }}" method="POST">
-            <button type="submit">Yes</button>
+        <form action="/delete_word_confirm/{{ id }}" method="POST" class="inline-form">
+            <button type="submit" class="link-button">Yes</button>
         </form>
         <a href="/allwords">No</a></h3>
 {% endblock %}

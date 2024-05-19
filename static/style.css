@@ -337,3 +337,21 @@ td, th {
     color: black;
     font-size: 0.8rem;
 }
+
+.inline-form {
+    display: inline;
+}
+
+.link-button {
+    background: none;
+    color: blue;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline; /* Makes it look more like a link */
+}
+
+.link-button:hover {
+    color: darkblue; /* Optional: change color on hover */
+}
