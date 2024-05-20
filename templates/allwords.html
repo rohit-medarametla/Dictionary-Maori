@@ -17,6 +17,7 @@
         <p>Categories</p>
         {% for category in categories %}
             <ul id="sidebar-links">
+
                 <li> <a href="/category/{{ category[0] }}">{{ category[1] }}</a> </li>
             </ul>
         {% endfor %}

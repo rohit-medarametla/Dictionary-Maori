@@ -34,6 +34,7 @@ def put_data(query, params):
         con.commit()
 
 
+# Function to establish connection to the database and execute queries
 def create_connection(db_file):
     try:
         connection = sqlite3.connect(db_file)
@@ -44,6 +45,7 @@ def create_connection(db_file):
         return None
 
 
+# Function to check if a user is logged in
 def is_logged_in():
     if session.get('email') is None:
         return False
@@ -51,6 +53,7 @@ def is_logged_in():
         return True
 
 
+# Function to check if a user is a teacher or student
 def is_teacher():
     if session.get('is_teacher') != 1:
         print("student")
@@ -60,15 +63,13 @@ def is_teacher():
         return True
 
 
-def user_detail():
-    return session
-
-
+# Route for home page
 @app.route('/')
 def render_home():  # put application's code here
     return render_template('home.html', logged_in=is_logged_in())
 
 
+# Route for user signup
 @app.route('/signup', methods=['POST', 'GET'])
 def render_signup():
     if is_logged_in():
@@ -219,34 +220,35 @@ def add_word():
 
 @app.route('/edit/<word_id>', methods=['GET', 'POST'])
 def edit_word(word_id):
-    if is_logged_in and is_teacher():
+    if is_logged_in() and is_teacher():
         about_word = get_list(
-            "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date"
+            "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date, cat_id_fk"
             " FROM Dictionary m "
             "INNER JOIN user u on m.user_id_fk = u.user_id "
             "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
         about_word = about_word[0]
-        print(about_word)
-        if request.method == "POST":
+        category_list = get_list("SELECT cat_id, category_name FROM category", "")
 
+        if request.method == "POST":
             mao_word = request.form.get('Maori').lower().strip()
             eng_word = request.form.get('English').lower().strip()
             deff = request.form.get('Definition').lower().strip()
             level = request.form.get('level').lower().strip()
             user_id = session.get('user_id')
             date_added = datetime.today().strftime('%Y-%m-%d')
-            category = request.form.get('cat_id')
+            cat_id = request.form.get('cat_id')
 
             put_data("UPDATE Dictionary SET"
-                     " Maori=?, English=?, Definition=?, level=?, last_edit_by=?, entry_date=? "
-                     "WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, word_id))
+                     " Maori=?, English=?, Definition=?, level=?, last_edit_by=?, entry_date=?, cat_id_fk=? "
+                     "WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, cat_id, word_id))
             flash("The word has been updated!", "info")
             return redirect('/allwords')
 
     else:
         return redirect('/?message=Need+to+be+teacher.')
 
-    return render_template('edit.html', logged_in=is_logged_in(),  word_de=about_word, word_id=word_id)
+    return render_template('edit.html', logged_in=is_logged_in(), word_de=about_word, word_id=word_id, categories=category_list)
+
 
 
 @app.route('/delete_category', methods=['POST'])
