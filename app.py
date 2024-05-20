@@ -55,18 +55,13 @@ def is_logged_in():
 
 # Function to check if a user is a teacher or student
 def is_teacher():
-    if session.get('is_teacher') != 1:
-        print("student")
-        return False
-    else:
-        print("teacher")
-        return True
+    return session.get('is_teacher') == 1
 
 
 # Route for home page
 @app.route('/')
-def render_home():  # put application's code here
-    return render_template('home.html', logged_in=is_logged_in())
+def render_home():
+    return render_template('home.html', logged_in=is_logged_in(), is_teacher=is_teacher())
 
 
 # Route for user signup
@@ -268,17 +263,12 @@ def render_delete_category():
 @app.route('/delete_category_confirm/<category_id>')
 def delete_category_confirm(category_id):
     if not is_logged_in():
-        return redirect('/?message=Need+tobe+logged+in.')
-    con = create_connection(DATABASE)
-    query = 'DELETE FROM category WHERE cat_id = ?'
-    cur = con.cursor()
-    cur.execute(query, (category_id,))
-    con.commit()
-    con.close()
+        return redirect('/?message=Need+to+be+logged+in.')
+    put_data('DELETE FROM category WHERE cat_id = ?',(category_id))
     return redirect('/admin')
 
 
-@app.route('/delete_word/<int:word_id>')
+@app.route('/delete_word/<word_id>')
 def render_delete_word(word_id):
     if not is_logged_in():
         return redirect('/?message=Need+to+be+logged+in.')
@@ -290,16 +280,11 @@ def render_delete_word(word_id):
                            logged_in=is_logged_in(), is_teacher=is_teacher())
 
 
-@app.route('/delete_word_confirm/<int:word_id>', methods=['POST'])
+@app.route('/delete_word_confirm/<word_id>', methods=['POST'])
 def delete_word_confirm(word_id):
     if not is_logged_in():
         return redirect('/?message=Need+to+be+logged+in.')
-    con = create_connection(DATABASE)
-    query = 'DELETE FROM Dictionary WHERE word_id = ?'
-    cur = con.cursor()
-    cur.execute(query, (word_id,))
-    con.commit()
-    con.close()
+    put_data('DELETE FROM Dictionary WHERE word_id = ?', (word_id,))
     return redirect('/allwords')
 
 

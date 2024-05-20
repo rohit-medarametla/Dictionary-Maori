@@ -68,22 +68,5 @@
     </div>
 </form>
 
-<h4>Delete a word</h4>
-<form class="myform" method="post" action="/delete_word">
-    <div class="form-group">
-        <div class="form-label"><label for="name">Word Name:</label></div>
-        <div class="form-element">
-            <select id="word" name="word">
-                {% for English in word_de %}
-                    <option value="{{ English[0] }}, {{ English[1] }}">{{ English[1] }}</option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="form-label"></div>
-        <div class="form-element"><input type="submit" value="Delete word"></div>
-    </div>
-</form>
 
 {% endblock %}
