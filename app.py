@@ -137,9 +137,8 @@ def render_login():
             session['is_teacher'] = is_teacher
             return redirect('/')
 
-    return render_template('login.html',  logged_in=is_logged_in())
+    return render_template('login.html',  logged_in=is_logged_in(),)
 
-    return render_template("allwords.html", word=words_list,  logged_in=is_logged_in(), categories=category_list)
 
 
 @app.route('/category/<cat_id>')
@@ -160,9 +159,9 @@ def render_category(cat_id):
 def render_word_detail(word_id):
     category_list = get_list("SELECT cat_id, category_name FROM category", "")
     about_word = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname, "
-                          "time_added , entry_date FROM Dictionary m "
-             "INNER JOIN user u on m.user_id_fk = u.user_id "
-             "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
+                                 "time_added , entry_date FROM Dictionary m "
+                                    "INNER JOIN user u on m.user_id_fk = u.user_id "
+                                "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
     return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in(), categories=category_list)
 
 
@@ -304,6 +303,7 @@ def delete_word_confirm(word_id):
 
 @app.route('/search', methods=['GET', 'POST'])
 def render_search():
+    category_list = get_list("SELECT cat_id, category_name FROM category", "")
     search = request.form['search']
     title = "Search results for: " + search
     query = ("SELECT word_id, Maori, English, definition, level, category_name  FROM Dictionary m "
@@ -317,14 +317,15 @@ def render_search():
     cur.execute(query, (search, search, search, search, search, search))
     search_list = cur.fetchall()
     con.close()
-    return render_template("allwords.html", word=search_list, title=title, logged_in=is_logged_in())
+    return render_template("allwords.html", word=search_list, title=title, logged_in=is_logged_in(), categories=category_list)
 
 
 @app.route('/allwords')
 def table():
     category_list = get_list("SELECT cat_id, category_name FROM category", "")
-    words_list = get_list("SELECT word_id, Maori, English, Definition, level, category_name, image  FROM Dictionary m "
-             "INNER JOIN category c ON m.cat_id_fk = c.cat_id", "")
+    words_list = get_list(
+        "SELECT word_id, Maori, English, Definition, level, category_name, image  FROM Dictionary m "
+               "INNER JOIN category c ON m.cat_id_fk = c.cat_id", "")
     print(words_list)
 
     return render_template("allwords.html", word=words_list, logged_in=is_logged_in(), categories=category_list)
