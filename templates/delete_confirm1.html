@@ -1,11 +1,23 @@
 {% extends "base.html" %}
+<!-- This template extends the base.html template -->
 
-{% block pageheading %}Confirm Delete{% endblock %}
+{% block pageheading %}
+Confirm Delete
+<!-- Page heading for confirmation of delete -->
+{% endblock %}
 
 {% block main %}
+<!-- Main content block -->
+
     <h3>Are you sure you want to delete {{ type }} {{ name }}?
+    <!-- Confirmation message with dynamic content -->
         <form action="/delete_{{ type }}_confirm/{{ id }}" method="POST" class="inline-form">
+        <!-- Form to submit confirmation -->
             <button type="submit" class="link-button">Yes</button>
+            <!-- Button to confirm deletion -->
         </form>
-        <a href="/allwords">No</a></h3>
+        <a href="/allwords">No</a>
+        <!-- Link to cancel delete and go back to all words -->
+    </h3>
 {% endblock %}
+<!-- End of main content block -->
