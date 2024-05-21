@@ -7,9 +7,9 @@
 {% block main %}
      <div class="sidebar">
         <p>Categories</p>
-        {% for cat_id in word %}
+        {% for category in categories %}
             <ul id="sidebar-links">
-                <li> <a href="/category/{{ cat_id[4] }}">{{ cat_id[5] }}</a> </li>
+                <li> <a href="/category/{{ category[0] }}">{{ category[1] }}</a> </li>
             </ul>
         {% endfor %}
     </div>

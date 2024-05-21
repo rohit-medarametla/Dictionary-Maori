@@ -6,7 +6,7 @@ from sqlite3 import Error
 from flask_bcrypt import Bcrypt
 from datetime import datetime
 
-DATABASE = "C:/Users/Admin/OneDrive - Wellington College/Dictionary-Maori/Maori.db"
+DATABASE = "Maori.db"
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "qwertyuiop"
@@ -27,6 +27,7 @@ def get_list(query, params):
     return query_list
 
 
+# this is a fuction that puts data in the database tables
 def put_data(query, params):
     with create_connection(DATABASE) as con:
         cur = con.cursor()
@@ -67,41 +68,48 @@ def render_home():
 # Route for user signup
 @app.route('/signup', methods=['POST', 'GET'])
 def render_signup():
+    # A if condition to check if user is logged in
     if is_logged_in():
         return redirect('allwords.html')
+    # if condition for loggin
     if request.method == 'POST':
         print(request.form)
-        fname = request.form.get('fname').title()
-        lname = request.form.get('lname').title().strip()
-        email = request.form.get('email').lower().strip()
-        password = request.form.get('password')
-        password2 = request.form.get('password2')
+        # getting the data from the form
+        fname = request.form.get('fname').title() # gets the first name and converts to tittle class
+        lname = request.form.get('lname').title().strip() # gets the last name and converts to tittle class and strip leading spaces
+        email = request.form.get('email').lower().strip() # gets email and, converts to lower case and strip leading spaces
+        password = request.form.get('password') # gets the password
+        password2 = request.form.get('password2') # Gets the confirm password
+        # Defult teacher set to 0 and will be considered as a student
         teacher = 0
+        # if the 'is_teacher' checkbox is checked set teacher flag to 1
         if request.form.get('is_teacher') == 'on':
             teacher = 1
-
+        # checks if the password matches
         if password != password2:
+            # Redirects to signup page with error message if passwords do 
             return redirect("\signup?error=Passwords+do+not+match")
-
+        # checks if password has minimum of 8 charecter
         if len(password) < 8:
             return redirect("\signup?error=Password+must+be+at+least+8+characters")
-
+        # So this enters hashed password into database
         hashed_password = bcrypt.generate_password_hash(password)
+        # this tries to run code
         try:
             put_data("INSERT INTO user (fname, lname, email, password, is_teacher ) ""VALUES (?, ?, ?, ?, ?)",
                      (fname, lname, email, hashed_password, teacher))
-
+        # this checks for any integrity error like duplicate email
         except sqlite3.IntegrityError:
             return redirect('\signup?error=Email+is+already+used')
 
         return redirect("\login")
     return render_template('signup.html', logged_in=is_logged_in(), is_teacher=is_teacher())
 
-
+# this routes codes the log in
 @app.route('/login', methods=['POST', 'GET'])
 def render_login():
 
-    if request.method == 'POST':
+    if request.method == 'POST': #grabs the form data from request
         email = request.form['email'].strip().lower()
         password = request.form['password'].strip()
         query = "SELECT user_id, fname, password, is_teacher FROM user WHERE email= ?"
@@ -317,28 +325,6 @@ def table():
 
     return render_template("allwords.html", word=words_list, logged_in=is_logged_in(), categories=category_list)
 
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return redirect(request.url)
-    file = request.files['file']
-    if file.filename == '':
-        return redirect(request.url)
-    if file:
-        filename = file.filename
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        add_image_to_database(filename)
-        return redirect(url_for('index'))
-
-
-def add_image_to_database(filename):
-    conn = sqlite3.connect('database.db')
-    cur = conn.cursor()
-    cur.execute("INSERT INTO Dictionary (image) VALUES (?)", (filename,))
-    conn.commit()
-    conn.close()
-    return render_template('upload.html')
 
 
 if __name__ == '__main__':
