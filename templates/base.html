@@ -1,40 +1,88 @@
 <!DOCTYPE html>
+<!-- Document type declaration for HTML5 -->
+
 <html lang="en">
+<!-- Opening HTML tag with language attribute set to English -->
+
 <head>
+    <!-- Head section containing metadata and external resources -->
+
     <meta charset="UTF-8">
+    <!-- Metadata specifying character encoding -->
+
     <title>Maori Dictionary</title>
+    <!-- Title of the webpage -->
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Metadata for responsive design -->
+
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&display=swap" rel="stylesheet">
+    <!-- Link to Google Fonts -->
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"/>
+    <!-- Link to Normalize.css for consistent rendering -->
+
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <!-- Link to a local stylesheet -->
+
 </head>
+
 <body>
+<!-- Body of the webpage -->
+
 <nav>
+    <!-- Navigation bar section -->
     <div class="container">
+        <!-- Container for navigation bar content -->
         <div class="navbar-brand">dictionary.</div>
+        <!-- Branding/logo for the navigation bar -->
         <div class="navbar-links">
+            <!-- Links in the navigation bar -->
             <a href="/">home</a>
+            <!-- Link to the home page -->
             {% if logged_in %}
+                <!-- Conditional block for logged-in users -->
                 <a href="/allwords">All words</a>
+                <!-- Link to view all words -->
                 {% if is_teacher %}
+                    <!-- Conditional block for teachers -->
                     <a href="/admin">Admin</a>
+                    <!-- Link to admin panel -->
                 {% endif %}
                 <a href="/logout">logout</a>
+                <!-- Link to logout -->
             {% else %}
+                <!-- Conditional block for users not logged in -->
                 <a href="/login">login</a>
+                <!-- Link to login page -->
             {% endif %}
         </div>
     </div>
 </nav>
+
 <div class="container">
+    <!-- Main container for the content -->
+
     <header>
+        <!-- Header section -->
         <h1>Maori Dictionary</h1>
+        <!-- Main heading of the page -->
         <h2>{% block pageheading %}{% endblock %}</h2>
+        <!-- Secondary heading, block to be filled by child templates -->
     </header>
+
     <main>
+        <!-- Main content section -->
         {% block main %}
+        <!-- Block to be filled by child templates -->
         {% endblock %}
     </main>
+
 </div>
+<!-- End of the main container -->
+
 </body>
+<!-- End of the body section -->
+
 </html>
+<!-- End of the HTML document -->
