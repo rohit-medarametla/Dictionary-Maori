@@ -164,29 +164,27 @@ def render_category(cat_id):
     # Set the title of the category page to the cat_id.
     title = cat_id
 
-    # receives a list of all categories from the database.
+    # uses get_list function to query and grab the data and stored it in category_list .
     category_list = get_list("SELECT cat_id, category_name FROM category", "")
 
-    # Print the recieved category list for debugging purposes.
+    # Print the recived category list to check if the code above is working right .
     print(category_list)
 
-    # receive a list of words belonging to the specified category from the database.
+    # uses get_list function to query and grab the data and stored it in words_list .
     words_list = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname"
                           " FROM Dictionary m "
                           "INNER JOIN user u on m.user_id_fk = u.user_id "
                           "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE cat_id=?", (cat_id, ))
 
-    # Print the recived words list for debugging purposes.
+    # Print the recived words list to check if the code above is working right .
     print(words_list)
 
-    # Render the category.html template with the retrieved data and pass it to the template.
+    # Render the category.html template with the received data and pass it to the template.
     return render_template("category.html", word=words_list, categories=category_list,
                            logged_in=is_logged_in(), title=title)
 
 
-
-
-# Define a route for accessing the detail page of a specific word based on its word_id.
+#  a route for accessing the detail page of a specific word based on its word_id.
 @app.route('/word_detail/<word_id>')
 def render_word_detail(word_id):
     # Retrieve a list of all categories from the database.
@@ -203,28 +201,28 @@ def render_word_detail(word_id):
 
 
 
-# Define a route for logging out the user.
+# a route for logging out the user.
 @app.route('/logout')
 def logout():
-    # Print the keys in the session for debugging purposes.
+    # Print the keys in the session for testing purposes.
     print(list(session.keys()))
 
     # Remove all keys from the session.
     [session.pop(key) for key in list(session.keys())]
 
-    # Print the keys in the session after removing them for debugging purposes.
+    # Print the keys in the session after removing them for testing purposes.
     print(list(session.keys()))
 
     # Redirect the user to the homepage with a message indicating successful logout.
     return redirect('/?message=See+you+next+time!')
 
 
-# Define a route for accessing the admin page.
+#  a route for accessing the admin page.
 @app.route('/admin')
 def render_admin():
     # Check if the user is logged in and is a teacher.
     if is_logged_in and is_teacher():
-        # Retrieve a list of all categories from the database.
+        # grabs a list of all categories from the database and stores it in the category_list variable.
         category_list = get_list("SELECT * FROM category", "")
 
         # Retrieve word details (word_id and English word) from the Dictionary table.
@@ -233,56 +231,90 @@ def render_admin():
         # If the user is not logged in or is not a teacher, redirect to the homepage with a message.
         return redirect('/?message=Need+to+be+logged+in.')
 
-    # Render the admin.html template with the retrieved data and pass it to the template.
+    # Render the admin.html template with the grabbed data and pass it to the template.
     return render_template("admin.html", logged_in=is_logged_in(), is_teacher=is_teacher(),
                            categories=category_list, word_detail=word_detail)
 
 
+# Route for adding a new category
 @app.route('/add_category', methods=['POST'])
 def add_category():
+    # Check if the user is logged in
     if not is_logged_in():
+        # If not logged in, redirect to the homepage with a message
         return redirect('/?message=Need+to+be+logged+in.')
+
+    # Check if the request method is POST
     if request.method == "POST":
+        # grabs the category name from the form data, convert it to lowercase, and strip whitespace
         cat_name = request.form.get('name').lower().strip()
+
+        # Insert the new category into the database
         put_data('INSERT INTO category (category_name) VALUES (?)', (cat_name,))
+
+        # Redirect to the admin page after adding the category
         return redirect('/admin')
 
 
+# Route for adding a new word
 @app.route('/add_newword', methods=['POST'])
 def add_word():
+    # Check if the user is logged in
     if not is_logged_in():
+        # If not logged in, redirect to the homepage with a message
         return redirect('/?message=Need+to+be+logged+in.')
+
+    # Check if the request method is POST
     if request.method == "POST":
+        # grab word details from the form data, convert them to lowercase, and strip whitespace
         mao_word = request.form.get('Maori').lower().strip()
         eng_word = request.form.get('English').lower().strip()
         deff = request.form.get('Definition').lower().strip()
         level = request.form.get('level').lower().strip()
+
+        # Grabs the user ID from the session
         user_id = session.get('user_id')
+
+        # Get the current date and time
         date_added = datetime.today().strftime('%Y-%m-%d')
         time_added = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Grabs the category ID from the form data
         category = request.form.get('cat_id')
-        image = "noimage"
+        image = "noimage"  # Default image
         category = category.split(", ")
         cat_id = category[0]
+
+        # Insert the new word into the database
         put_data('INSERT INTO Dictionary (Maori, English, Definition, level, image,  cat_id_fk, entry_date,'
                  ' user_id_fk, time_added ) VALUES (?,?,?,?,?,?,?,?,?)',
                  (mao_word, eng_word, deff, level, image, cat_id, date_added, user_id, time_added,))
 
+    # Redirect to the admin page after adding the word
     return redirect('/admin')
 
 
+# Route for editing a word
 @app.route('/edit/<word_id>', methods=['GET', 'POST'])
 def edit_word(word_id):
+    # Check if the user is logged in and is a teacher
     if is_logged_in() and is_teacher():
+        # Grabs information about the word with the specified word_id
         about_word = get_list(
             "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date, cat_id_fk"
             " FROM Dictionary m "
             "INNER JOIN user u on m.user_id_fk = u.user_id "
             "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
+
+        # Extract the first row from the result
         about_word = about_word[0]
+
+        # Grabs a list of all categories from the database
         category_list = get_list("SELECT cat_id, category_name FROM category", "")
 
+        # Check if the request method is POST
         if request.method == "POST":
+            # Grabs updated word details from the form data
             mao_word = request.form.get('Maori').lower().strip()
             eng_word = request.form.get('English').lower().strip()
             deff = request.form.get('Definition').lower().strip()
@@ -291,90 +323,157 @@ def edit_word(word_id):
             date_added = datetime.today().strftime('%Y-%m-%d')
             cat_id = request.form.get('cat_id')
 
+            # Update the word in the database
             put_data("UPDATE Dictionary SET"
                      " Maori=?, English=?, Definition=?, level=?, last_edit_by=?, entry_date=?, cat_id_fk=? "
                      "WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, cat_id, word_id))
+
+            # Flash a message indicating that the word has been updated
             flash("The word has been updated!", "info")
+
+            # Redirect to the page displaying all words
             return redirect('/allwords')
 
     else:
+        # If the user is not logged in or is not a teacher, redirect to the homepage with a message
         return redirect('/?message=Need+to+be+teacher.')
 
-    return render_template('edit.html', logged_in=is_logged_in(), word_de=about_word, word_id=word_id, categories=category_list)
+    # Render the edit.html template with the retrieved data and pass it to the template
+    return render_template('edit.html', logged_in=is_logged_in(), word_de=about_word, word_id=word_id,
+                           categories=category_list)
 
 
-
+# Route for rendering the delete page for category
 @app.route('/delete_category', methods=['POST'])
 def render_delete_category():
+    # Check if the user is logged in
     if not is_logged_in():
+        # If not logged in, redirect to the homepage with a message
         return redirect('/?message=Need+to+be+logged+in.')
+
+    # Check if the request method is POST
     if request.method == "POST":
+        # Retrieve the category ID and name from the form data
         category = request.form.get('cat_id')
         category = category.split(", ")
         cat_id = category[0]
         cat_name = category[1]
+
+        # Render the delete_confirm.html template with the category ID, name, and type of deletion
         return render_template("delete_confirm.html", id=cat_id, category_name=cat_name,
                                type="category", logged_in=is_logged_in(), is_teacher=is_teacher())
+
+    # Redirect to the admin page if the request method is not POST
     return redirect('/admin')
 
 
+# Route for confirming and deleting a category
 @app.route('/delete_category_confirm/<category_id>')
 def delete_category_confirm(category_id):
+    # Check if the user is logged in
     if not is_logged_in():
+        # If not logged in, redirect to the homepage with a message
         return redirect('/?message=Need+to+be+logged+in.')
-    put_data('DELETE FROM category WHERE cat_id = ?',(category_id))
+
+    # Delete the category from the database using the provided category_id
+    put_data('DELETE FROM category WHERE cat_id = ?', (category_id,))
+
+    # Redirect to the admin page after deletion
     return redirect('/admin')
 
 
+# Route for rendering the confirmation page for deleting a word
 @app.route('/delete_word/<word_id>')
 def render_delete_word(word_id):
+    # Check if the user is logged in
     if not is_logged_in():
+        # If not logged in, redirect to the homepage with a message
         return redirect('/?message=Need+to+be+logged+in.')
-    if not is_teacher():
-        return redirect('/')
-    word_info = get_list("SELECT Maori FROM Dictionary WHERE word_id = ?", (word_id, ))
 
+    # Check if the user is a teacher
+    if not is_teacher():
+        # If not a teacher, redirect to the homepage
+        return redirect('/')
+
+    # Grabs the Maori word associated with the specified word_id from the database
+    word_info = get_list("SELECT Maori FROM Dictionary WHERE word_id = ?", (word_id,))
+
+    # Render the delete_confirm1.html template with the word information and deletion details
     return render_template("delete_confirm1.html", id=word_id, name=word_info[0][0], type="word",
                            logged_in=is_logged_in(), is_teacher=is_teacher())
 
 
+# Route for confirming the deletion of a word
 @app.route('/delete_word_confirm/<word_id>', methods=['POST'])
 def delete_word_confirm(word_id):
+    # Check if the user is logged in
     if not is_logged_in():
+        # If not logged in, redirect to the homepage with a message
         return redirect('/?message=Need+to+be+logged+in.')
+
+    # Delete the word with the specified word_id from the database
     put_data('DELETE FROM Dictionary WHERE word_id = ?', (word_id,))
+
+    # Redirect to the page displaying all words after deletion
     return redirect('/allwords')
 
 
+# Route for rendering search results
 @app.route('/search', methods=['GET', 'POST'])
 def render_search():
+    # Retrieve a list of all categories from the database
     category_list = get_list("SELECT cat_id, category_name FROM category", "")
+
+    # Get the search term from the form data
     search = request.form['search']
+
+    # Create a title for the search results page
     title = "Search results for: " + search
-    query = ("SELECT word_id, Maori, English, definition, level, category_name  FROM Dictionary m "
+
+    # SQL query to search for the term in various columns of the Dictionary table
+    query = ("SELECT word_id, Maori, English, definition, level, category_name FROM Dictionary m "
              "INNER JOIN category c ON m.cat_id_fk = c.cat_id "
-             "WHERE " 
-            "word_id like ? or Maori like ? OR English like ? OR definition like ? OR level like ? "
-             "OR category_name like ? ")
+             "WHERE "
+             "word_id LIKE ? OR Maori LIKE ? OR English LIKE ? OR definition LIKE ? OR level LIKE ? "
+             "OR category_name LIKE ?")
+
+    # Modify the search term for partial matching
     search = "%" + search + "%"
+
+    # Establish a connection to the database
     con = create_connection(DATABASE)
     cur = con.cursor()
+
+    # Execute the search query with the search term applied to all columns
     cur.execute(query, (search, search, search, search, search, search))
+
+    # Fetch all matching rows
     search_list = cur.fetchall()
+
+    # Close the database connection
     con.close()
-    return render_template("allwords.html", word=search_list, title=title, logged_in=is_logged_in(), categories=category_list)
+
+    # Render the allwords.html template with the search results and other data
+    return render_template("allwords.html", word=search_list, title=title, logged_in=is_logged_in(),
+                           categories=category_list)
 
 
+# Route for displaying all words in the dictionary
 @app.route('/allwords')
 def table():
+    # Retrieve a list of all categories from the database
     category_list = get_list("SELECT cat_id, category_name FROM category", "")
+
+    # Retrieve a list of all words from the Dictionary table, including related category data
     words_list = get_list(
-        "SELECT word_id, Maori, English, Definition, level, category_name, image  FROM Dictionary m "
-               "INNER JOIN category c ON m.cat_id_fk = c.cat_id", "")
+        "SELECT word_id, Maori, English, Definition, level, category_name, image FROM Dictionary m "
+        "INNER JOIN category c ON m.cat_id_fk = c.cat_id", "")
+
+    # Print the list of words to the console for debugging purposes
     print(words_list)
 
+    # Render the allwords.html template with the list of words and other data
     return render_template("allwords.html", word=words_list, logged_in=is_logged_in(), categories=category_list)
-
 
 
 if __name__ == '__main__':
