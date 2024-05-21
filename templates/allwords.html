@@ -1,51 +1,72 @@
 {% extends 'base.html' %}
+<!-- This template extends the base.html template -->
 
 {% block pageheading %}
-
+<!-- This block is left empty as it's meant for the page heading, which is not defined here -->
 {% endblock %}
 
 {% block main %}
-    <div class="searchbar">
-                <form method="POST" action="/search">
-                <input type="text" name="search" id="search">
-                <input type="submit" value="Search">
-                </form>
-              </div>
+<!-- This block contains the main content of the page -->
+
+<div class="searchbar">
+    <!-- Search bar section -->
+    <form method="POST" action="/search">
+        <!-- Form for search functionality; sends POST request to /search -->
+        <input type="text" name="search" id="search">
+        <!-- Text input for search query -->
+        <input type="submit" value="Search">
+        <!-- Submit button for search -->
+    </form>
+</div>
+
 <h2> {{ title }} </h2>
+<!-- Heading for the search bar results -->
 
-    <div class="sidebar">
-        <p>Categories</p>
-        {% for category in categories %}
-            <ul id="sidebar-links">
+<div class="sidebar">
+    <!-- Sidebar section -->
+    <p>Categories</p>
+    <!-- Static text for categories -->
+    {% for category in categories %}
+    <!-- Loop through categories -->
+    <ul id="sidebar-links">
+        <!-- Unordered list for sidebar links -->
+        <li> <a href="/category/{{ category[0] }}">{{ category[1] }}</a> </li>
+        <!-- List item with a link to each category -->
+    </ul>
+    {% endfor %}
+</div>
 
-                <li> <a href="/category/{{ category[0] }}">{{ category[1] }}</a> </li>
-            </ul>
-        {% endfor %}
-    </div>
-    <div class="content">
+<div class="content">
+    <!-- Content section -->
     <table class="list">
-
+        <!-- Table for displaying word list -->
         <tr>
             <th style="width:35%">Maori Word</th>
+            <!-- Table header for Maori Word column -->
             <th style="width:35%">English Translation</th>
+            <!-- Table header for English Translation column -->
             <th style="width:15%">Level</th>
+            <!-- Table header for Level column -->
             <th style="width:15%">Category</th>
-
+            <!-- Table header for Category column -->
         </tr>
 
-
-          {% for id in word %}
-         <tr>
-        <td>{{ id[1] }}</td>
-        <td><a href="/word_detail/{{ id[0] }}">{{ id[2] }}</a></td>
-        <td>{{ id[4] }}</td>
-        <td>{{ id[5] }}</td>
+        {% for id in word %}
+        <!-- Loop through word list -->
+        <tr>
+            <td>{{ id[1] }}</td>
+            <!-- Table data for Maori Word -->
+            <td><a href="/word_detail/{{ id[0] }}">{{ id[2] }}</a></td>
+            <!-- Table data for English Translation with a link to word detail -->
+            <td>{{ id[4] }}</td>
+            <!-- Table data for Level -->
+            <td>{{ id[5] }}</td>
+            <!-- Table data for Category -->
         </tr>
         {% endfor %}
     </table>
-    </div>
-    <script src="script.js"></script>
+</div>
 
 
 {% endblock %}
-
+<!-- End of the main content block -->
