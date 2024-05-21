@@ -171,10 +171,9 @@ def render_category(cat_id):
     print(category_list)
 
     # uses get_list function to query and grab the data and stored it in words_list .
-    words_list = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname"
-                          " FROM Dictionary m "
-                          "INNER JOIN user u on m.user_id_fk = u.user_id "
-                          "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE cat_id=?", (cat_id, ))
+    words_list = get_list("SELECT word_id, Maori, English, level, category_name"
+                                " FROM Dictionary m "
+                                "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE cat_id=?", (cat_id, ))
 
     # Print the recived words list to check if the code above is working right .
     print(words_list)
@@ -223,7 +222,7 @@ def render_admin():
     # Check if the user is logged in and is a teacher.
     if is_logged_in and is_teacher():
         # grabs a list of all categories from the database and stores it in the category_list variable.
-        category_list = get_list("SELECT * FROM category", "")
+        category_list = get_list("SELECT cat_id, category_name FROM category", "")
 
         # Retrieve word details (word_id and English word) from the Dictionary table.
         word_detail = get_list("SELECT word_id, English FROM Dictionary", "")
@@ -301,9 +300,8 @@ def edit_word(word_id):
     if is_logged_in() and is_teacher():
         # Grabs information about the word with the specified word_id
         about_word = get_list(
-            "SELECT word_id, Maori, English, Definition, level, image, category_name, fname, entry_date, cat_id_fk"
+            "SELECT Maori, English, Definition, level, cat_id_fk"
             " FROM Dictionary m "
-            "INNER JOIN user u on m.user_id_fk = u.user_id "
             "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
 
         # Extract the first row from the result
@@ -325,7 +323,7 @@ def edit_word(word_id):
 
             # Update the word in the database
             put_data("UPDATE Dictionary SET"
-                     " Maori=?, English=?, Definition=?, level=?, last_edit_by=?, entry_date=?, cat_id_fk=? "
+                     " Maori=?, English=?, Definition=?, level=?, user_id_fk=?, entry_date=?, cat_id_fk=? "
                      "WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, cat_id, word_id))
 
             # Flash a message indicating that the word has been updated
@@ -466,7 +464,7 @@ def table():
 
     # Retrieve a list of all words from the Dictionary table, including related category data
     words_list = get_list(
-        "SELECT word_id, Maori, English, Definition, level, category_name, image FROM Dictionary m "
+        "SELECT word_id, Maori, English, level, category_name FROM Dictionary m "
         "INNER JOIN category c ON m.cat_id_fk = c.cat_id", "")
 
     # Print the list of words to the console for debugging purposes

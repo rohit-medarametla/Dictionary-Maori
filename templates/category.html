@@ -2,12 +2,12 @@
 <!-- This template extends the base.html template -->
 
 {% block pageheading %}
-<!-- This block is left empty as it's meant for the page heading, which is not defined here -->
+<!-- This block is left empty as it's meant for the page heading -->
 {% endblock %}
 
 {% block main %}
 <!-- This block contains the main content of the page -->
-
+<h2>{{ tittle }}</h2>
 <div class="sidebar">
     <!-- Sidebar section -->
     <p>Categories</p>
@@ -15,7 +15,7 @@
     {% for category in categories %}
     <!-- Loop through categories -->
     <ul id="sidebar-links">
-        <!-- Unordered list for sidebar links -->
+        <!--  list for sidebar links -->
         <li> <a href="/category/{{ category[0] }}">{{ category[1] }}</a> </li>
         <!-- List item with a link to each category -->
     </ul>
@@ -44,9 +44,9 @@
             <!-- Table data for Maori Word -->
             <td><a href="/word_detail/{{ id[0] }}">{{ id[2] }}</a></td>
             <!-- Table data for English Translation with a link to word detail -->
-            <td>{{ id[4] }}</td>
+            <td>{{ id[3] }}</td>
             <!-- Table data for Level -->
-            <td>{{ id[5] }}</td>
+            <td>{{ id[4] }}</td>
             <!-- Table data for Category -->
         </tr>
         {% endfor %}
