@@ -1,21 +1,41 @@
 {% extends "base.html" %}
+<!-- This template extends the base.html template -->
 
-{% block pageheading %}login{% endblock %}
+{% block pageheading %}
+login
+<!-- Sets the page heading to "login" -->
+{% endblock %}
 
 {% block main %}
+<!-- Main content block -->
+
 <form class="myform" method="POST">
+    <!-- Form for submitting login information -->
     <div class="form-group">
+        <!-- Group for email input -->
         <div class="form-label">Email:</div>
+        <!-- Label for email input -->
         <div class="form-element"><input type="email" name="email" id="email" required></div>
+        <!-- Email input field -->
     </div>
     <div class="form-group">
+        <!-- Group for password input -->
         <div class="form-label">Password:</div>
+        <!-- Label for password input -->
         <div class="form-element"><input type="password" name="password" id="password" required></div>
+        <!-- Password input field -->
     </div>
     <div class="form-group">
+        <!-- Group for submit button -->
         <div class="form-level"></div>
+        <!-- Empty level division -->
         <div class="form-element"><input type="submit" value="Login"></div>
+        <!-- Submit button for login -->
     </div>
 </form>
+<!-- End of login form -->
+
 <p><br><br><br>If you don't yet have an account, please <a href="/signup">sign up</a>.</p>
+<!-- Text and link to sign up if the user doesn't have an account -->
 {% endblock %}
+<!-- End of main content block -->
