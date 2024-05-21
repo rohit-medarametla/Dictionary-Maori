@@ -1,66 +1,93 @@
 {% extends 'base.html' %}
+<!-- This template extends the base.html template -->
+
 {% block pageheading %}
+<!-- Page heading block is left empty, can be customized if needed -->
 {% endblock %}
+
 {% block main %}
-   <div class="sidebar">
-        <p>Categories</p>
-        {% for category in categories %}
-            <ul id="sidebar-links">
-                <li> <a href="/category/{{ category[0] }}">{{ category[1] }}</a> </li>
-            </ul>
-        {% endfor %}
-    </div>
-    <div class="content">
-    <table class="info">
-    <tr class="header">
-    {% for id in wordinfo %}
-        <td style="width:25%">Maori Word</td>
-        <td style="width:25%">English Translation</td>
-        <td style="width:25%">Category</td>
-        <td style="width:25%">Level</td>
-    </tr>
-    <tr>
-        <td>{{ id[1] }}</td>
-        <td>{{ id[2] }}</td>
-        <td>{{ id[6] }}</td>
-        <td>{{ id[4] }}</td>
-    </tr>
-    <tr class="header">
-        <td colspan="4">Definition</td>
-    </tr>
-    <tr>
-        <td colspan="4">{{ id[3] }}</td>
-    </tr>
-    <tr class="header">
-        <td colspan="4">Image</td>
-    </tr>
-    <tr>
-        <td colspan="4">
-            <img src="/static/images/{{ id[5] }}.jpg">
-        </td>
-    </tr>
-    <tr class="header">
-        <td colspan="4">Last modified by</td>
-    </tr>
-    <tr>
-        <td colspan="4">{{ id[7] }}</td>
-    </tr>
-    <tr class="header">
-        <td colspan="4">Modification</td>
-    </tr>
-    <tr>
-        <td colspan="4"><a href="/edit/{{ id[0] }}">Edit </a> </td>
-    </tr>
-        <tr>
-        <td colspan="4"> <form action="/delete_word/{{ id[0] }}" method="GET" class="inline-form">
-            <button type="submit" class="link-button">Delete Word</button>
-        </form> </td>
-        </tr>
+<!-- Main content block -->
 
-        </table>
-    </div>
-
-
+<div class="sidebar">
+    <!-- Sidebar for displaying categories -->
+    <p>Categories</p>
+    {% for category in categories %}
+    <ul id="sidebar-links">
+        <!-- Loop through each category and create a list item with a link -->
+        <li><a href="/category/{{ category[0] }}">{{ category[1] }}</a></li>
+    </ul>
     {% endfor %}
-{% endblock %}
+</div>
 
+<div class="content">
+    <!-- Main content area -->
+    <table class="info">
+        <!-- Table for displaying word information -->
+        <tr class="header">
+            <!-- Table headers -->
+            <td style="width:25%">Maori Word</td>
+            <td style="width:25%">English Translation</td>
+            <td style="width:25%">Category</td>
+            <td style="width:25%">Level</td>
+        </tr>
+        {% for id in wordinfo %}
+        <!-- Loop through each word information and display details -->
+        <tr>
+            <td>{{ id[1] }}</td>
+            <!-- Maori word -->
+            <td>{{ id[2] }}</td>
+            <!-- English translation -->
+            <td>{{ id[6] }}</td>
+            <!-- Category -->
+            <td>{{ id[4] }}</td>
+            <!-- Level -->
+        </tr>
+        <tr class="header">
+            <td colspan="4">Definition</td>
+            <!-- Definition header spanning all columns -->
+        </tr>
+        <tr>
+            <td colspan="4">{{ id[3] }}</td>
+            <!-- Word definition -->
+        </tr>
+        <tr class="header">
+            <td colspan="4">Image</td>
+            <!-- Image header spanning all columns -->
+        </tr>
+        <tr>
+            <td colspan="4">
+                <img src="/static/images/{{ id[5] }}.jpg">
+                <!-- Word image -->
+            </td>
+        </tr>
+        <tr class="header">
+            <td colspan="4">Last modified by</td>
+            <!-- Last modified by header spanning all columns -->
+        </tr>
+        <tr>
+            <td colspan="4">{{ id[7] }}</td>
+            <!-- Last modified by user -->
+        </tr>
+        <tr class="header">
+            <td colspan="4">Modification</td>
+            <!-- Modification header spanning all columns -->
+        </tr>
+        <tr>
+            <td colspan="4">
+                <a href="/edit/{{ id[0] }}">Edit</a>
+                <!-- Edit link -->
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <form action="/delete_word/{{ id[0] }}" method="GET" class="inline-form">
+                    <button type="submit" class="link-button">Delete Word</button>
+                    <!-- Delete button -->
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
