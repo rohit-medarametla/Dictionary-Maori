@@ -1,39 +1,72 @@
 {% extends "base.html" %}
+<!-- This template extends the base.html template -->
 
-{% block pageheading %}{% if word_de == None %}Add{% else %}Edit{% endif %} word{% endblock %}
+{% block pageheading %}
+<!-- Page heading block -->
+{% if word_de == None %}
+    Add
+{% else %}
+    Edit
+{% endif %}
+<!-- Conditional block to determine if adding or editing a word -->
+word
+<!-- Static text for the page heading -->
+{% endblock %}
 
 {% block main %}
+<!-- Main content block -->
+
 <form class="myform" method="post" action="/edit/{{ word_id }}" >
+    <!-- Form for editing a word; sends POST request to /edit/{{ word_id }} -->
     <div class="form-group">
+        <!-- Grouping for Maori word input -->
         <div class="form-label"><label for="Maori"> Maori word name</label> </div>
+        <!-- Label for Maori word input -->
         <div class="form-element"><input type="text" name="Maori" id="Maori" {% if word_de != None %} value="{{ word_de[1] }}" {% endif %} required></div>
+        <!-- Input field for Maori word name; pre-filled -->
     </div>
     <div class="form-group">
+        <!-- Grouping for English word input -->
         <div class="form-label"><label for="English"> English word name</label> </div>
+        <!-- Label for English word input -->
         <div class="form-element"><input type="text" name="English" id="English" {% if word_de != None %} value="{{ word_de[2] }}" {% endif %} required></div>
+        <!-- Input field for English word name; pre-filled -->
     </div>
     <div class="form-group">
+        <!-- Grouping for word definition input -->
         <div class="form-label"><label for="Definition"> Word definition</label> </div>
+        <!-- Label for word definition input -->
         <div class="form-element"><input type="text" name="Definition" id="Definition" {% if word_de != None %} value="{{ word_de[3] }}" {% endif %} required></div>
+        <!-- Input field for word definition; pre-filled -->
     </div>
     <div class="form-group">
+        <!-- Grouping for word level input -->
         <div class="form-label"><label for="level"> Word level</label> </div>
+        <!-- Label for word level input -->
         <div class="form-element"><input type="text" name="level" id="level" {% if word_de != None %} value="{{ word_de[4] }}" {% endif %} required></div>
+        <!-- Input field for word level; pre-filled -->
     </div>
     <div class="form-group">
+        <!-- Grouping for category selection -->
         <div class="form-label"><label for="cat_id">Category Name:</label></div>
+        <!-- Label for category selection -->
         <div class="form-element">
             <select id="cat_id" name="cat_id">
+                <!-- Dropdown to select category -->
                 {% for category in categories %}
                     <option value="{{ category[0] }}" {% if word_de != None and word_de[9] == category[0] %}selected{% endif %}>{{ category[1] }}</option>
+                    <!-- Option for each category; selected if editing and category matches -->
                 {% endfor %}
             </select>
         </div>
     </div>
 
     <div class="form-group">
+        <!-- Grouping for submit button -->
         <div class="form-label"></div>
         <div class="form-button"><input type="submit" value="{% if word_de == None %}Add{% else %}Edit{% endif %} Word"></div>
+        <!-- Submit button for adding or editing a word -->
     </div>
 </form>
 {% endblock %}
+<!-- End of the main content block -->
