@@ -109,22 +109,32 @@ def render_signup():
 @app.route('/login', methods=['POST', 'GET'])
 def render_login():
 
-    if request.method == 'POST': #grabs the form data from request
+    if request.method == 'POST': # Check if the request method is POST, indicating that the form has been submitted.
+        # Retrieve the email and password from the form data, stripping any leading whitespace.
+        # Convert the email to lowercase to ensure case-insensitive comparison.
         email = request.form['email'].strip().lower()
         password = request.form['password'].strip()
+        # define the sql query to select user details from the user table based on the email given by the user
         query = "SELECT user_id, fname, password, is_teacher FROM user WHERE email= ?"
+        # creates a connection to the database
         con = create_connection(DATABASE)
+        # creates a cursor object
         cur = con.cursor()
+        # Exucute the SQL query, passing the email as a parameter to prevent SQL injection
         cur.execute(query, (email,))
+        # Fetch the first row of the result set, which contains the user data.
         user_data = cur.fetchone()
         print(user_data)
+        # Close the database connection.
         con.close()
-
+        # a if statement if user data is none then it redirect
         if user_data is None:
+            # Redirect the user back to the previous page (referrer) with an error message indicating invalid username or password
             redirect(request.referrer + '?error=Invalid+username+or+password')
 
         else:
             try:
+                # Extract user data from user_data
                 user_id = user_data[0]
                 first_name = user_data[1]
                 db_password = user_data[2]
@@ -132,58 +142,98 @@ def render_login():
             except IndexError:
                 return redirect('/login?error=Invalid+username+or+password')
 
+            # Check if the password provided matches the hashed password stored in the database.
             if not bcrypt.check_password_hash(db_password, password):
+                # If the passwords don't match, redirect back to the previous page with an error message.
                 return redirect(request.referrer + "?error=Email+invalid+or+password+incorrect")
-
+            # If the password matches, store user information in the session.
             session['email'] = email
             session['user_id'] = user_id
             session['firstname'] = first_name
             session['is_teacher'] = is_teacher
+            # Redirect the user to the homepage.
             return redirect('/')
 
     return render_template('login.html',  logged_in=is_logged_in(),)
 
 
 
+# Define a route for accessing a specific category page based on its cat_id.
 @app.route('/category/<cat_id>')
 def render_category(cat_id):
+    # Set the title of the category page to the cat_id.
     title = cat_id
+
+    # receives a list of all categories from the database.
     category_list = get_list("SELECT cat_id, category_name FROM category", "")
+
+    # Print the recieved category list for debugging purposes.
     print(category_list)
+
+    # receive a list of words belonging to the specified category from the database.
     words_list = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname"
                           " FROM Dictionary m "
                           "INNER JOIN user u on m.user_id_fk = u.user_id "
                           "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE cat_id=?", (cat_id, ))
+
+    # Print the recived words list for debugging purposes.
     print(words_list)
+
+    # Render the category.html template with the retrieved data and pass it to the template.
     return render_template("category.html", word=words_list, categories=category_list,
                            logged_in=is_logged_in(), title=title)
 
 
+
+
+# Define a route for accessing the detail page of a specific word based on its word_id.
 @app.route('/word_detail/<word_id>')
 def render_word_detail(word_id):
+    # Retrieve a list of all categories from the database.
     category_list = get_list("SELECT cat_id, category_name FROM category", "")
+
+    # Retrieve detailed information about the specified word from the database.
     about_word = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname, "
-                                 "time_added , entry_date FROM Dictionary m "
-                                    "INNER JOIN user u on m.user_id_fk = u.user_id "
-                                "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
+                          "time_added , entry_date FROM Dictionary m "
+                          "INNER JOIN user u on m.user_id_fk = u.user_id "
+                          "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
+
+    # Render the word_detail.html template with the retrieved word information and pass it to the template.
     return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in(), categories=category_list)
 
 
+
+# Define a route for logging out the user.
 @app.route('/logout')
 def logout():
+    # Print the keys in the session for debugging purposes.
     print(list(session.keys()))
+
+    # Remove all keys from the session.
     [session.pop(key) for key in list(session.keys())]
+
+    # Print the keys in the session after removing them for debugging purposes.
     print(list(session.keys()))
+
+    # Redirect the user to the homepage with a message indicating successful logout.
     return redirect('/?message=See+you+next+time!')
 
 
+# Define a route for accessing the admin page.
 @app.route('/admin')
 def render_admin():
+    # Check if the user is logged in and is a teacher.
     if is_logged_in and is_teacher():
+        # Retrieve a list of all categories from the database.
         category_list = get_list("SELECT * FROM category", "")
+
+        # Retrieve word details (word_id and English word) from the Dictionary table.
         word_detail = get_list("SELECT word_id, English FROM Dictionary", "")
     else:
+        # If the user is not logged in or is not a teacher, redirect to the homepage with a message.
         return redirect('/?message=Need+to+be+logged+in.')
+
+    # Render the admin.html template with the retrieved data and pass it to the template.
     return render_template("admin.html", logged_in=is_logged_in(), is_teacher=is_teacher(),
                            categories=category_list, word_detail=word_detail)
 
