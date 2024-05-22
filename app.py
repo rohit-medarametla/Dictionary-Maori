@@ -196,7 +196,7 @@ def render_word_detail(word_id):
                           "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
 
     # Render the word_detail.html template with the retrieved word information and pass it to the template.
-    return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in(), categories=category_list)
+    return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in(), categories=category_list, is_teacher=is_teacher())
 
 
 
@@ -275,8 +275,7 @@ def add_word():
         user_id = session.get('user_id')
 
         # Get the current date and time
-        date_added = datetime.today().strftime('%Y-%m-%d')
-        time_added = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        date_time_added = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         # Grabs the category ID from the form data
         category = request.form.get('cat_id')
@@ -286,8 +285,8 @@ def add_word():
 
         # Insert the new word into the database
         put_data('INSERT INTO Dictionary (Maori, English, Definition, level, image,  cat_id_fk, entry_date,'
-                 ' user_id_fk, time_added ) VALUES (?,?,?,?,?,?,?,?,?)',
-                 (mao_word, eng_word, deff, level, image, cat_id, date_added, user_id, time_added,))
+                 ' user_id_fk ) VALUES (?,?,?,?,?,?,?,?)',
+                 (mao_word, eng_word, deff, level, image, cat_id, date_time_added, user_id,))
 
     # Redirect to the admin page after adding the word
     return redirect('/admin')
@@ -338,7 +337,7 @@ def edit_word(word_id):
 
     # Render the edit.html template with the retrieved data and pass it to the template
     return render_template('edit.html', logged_in=is_logged_in(), word_de=about_word, word_id=word_id,
-                           categories=category_list)
+                           categories=category_list, is_teacher=is_teacher())
 
 
 # Route for rendering the delete page for category
@@ -471,7 +470,7 @@ def table():
     print(words_list)
 
     # Render the allwords.html template with the list of words and other data
-    return render_template("allwords.html", word=words_list, logged_in=is_logged_in(), categories=category_list)
+    return render_template("allwords.html", word=words_list, logged_in=is_logged_in(), categories=category_list, is_teacher=is_teacher())
 
 
 if __name__ == '__main__':
