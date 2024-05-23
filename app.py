@@ -75,7 +75,7 @@ def render_signup():
     if request.method == 'POST':
         print(request.form)
         # getting the data from the form
-        fname = request.form.get('fname').title() # gets the first name and converts to tittle class
+        fname = request.form.get('fname').title()  # gets the first name and converts to tittle class
         lname = request.form.get('lname').title().strip() # gets the last name and converts to tittle class and strip leading spaces
         email = request.form.get('email').lower().strip() # gets email and, converts to lower case and strip leading spaces
         password = request.form.get('password') # gets the password
@@ -102,7 +102,7 @@ def render_signup():
         except sqlite3.IntegrityError:
             return redirect('\signup?error=Email+is+already+used')
 
-        return redirect("\login")
+        return redirect("/login")
     return render_template('signup.html', logged_in=is_logged_in(), is_teacher=is_teacher())
 
 # this routes codes the log in
@@ -266,9 +266,9 @@ def add_word():
     # Check if the request method is POST
     if request.method == "POST":
         # grab word details from the form data, convert them to lowercase, and strip whitespace
-        mao_word = request.form.get('Maori').lower().strip()
-        eng_word = request.form.get('English').lower().strip()
-        deff = request.form.get('Definition').lower().strip()
+        maori_word = request.form.get('Maori').lower().strip()
+        english_word = request.form.get('English').lower().strip()
+        definition = request.form.get('Definition').lower().strip()
         level = request.form.get('level').lower().strip()
 
         # Grabs the user ID from the session
@@ -286,7 +286,7 @@ def add_word():
         # Insert the new word into the database
         put_data('INSERT INTO Dictionary (Maori, English, Definition, level, image,  cat_id_fk, entry_date,'
                  ' user_id_fk ) VALUES (?,?,?,?,?,?,?,?)',
-                 (mao_word, eng_word, deff, level, image, cat_id, date_time_added, user_id,))
+                 (maori_word, english_word, definition, level, image, cat_id, date_time_added, user_id,))
 
     # Redirect to the admin page after adding the word
     return redirect('/admin')
@@ -312,9 +312,9 @@ def edit_word(word_id):
         # Check if the request method is POST
         if request.method == "POST":
             # Grabs updated word details from the form data
-            mao_word = request.form.get('Maori').lower().strip()
-            eng_word = request.form.get('English').lower().strip()
-            deff = request.form.get('Definition').lower().strip()
+            maori_word = request.form.get('Maori').lower().strip()
+            english_word = request.form.get('English').lower().strip()
+            definition = request.form.get('Definition').lower().strip()
             level = request.form.get('level').lower().strip()
             user_id = session.get('user_id')
             date_added = datetime.today().strftime('%Y-%m-%d')
@@ -323,7 +323,7 @@ def edit_word(word_id):
             # Update the word in the database
             put_data("UPDATE Dictionary SET"
                      " Maori=?, English=?, Definition=?, level=?, user_id_fk=?, entry_date=?, cat_id_fk=? "
-                     "WHERE word_id=?", (mao_word, eng_word, deff, level, user_id, date_added, cat_id, word_id))
+                     "WHERE word_id=?", (maori_word, english_word, definition, level, user_id, date_added, cat_id, word_id))
 
             # Flash a message indicating that the word has been updated
             flash("The word has been updated!", "info")
@@ -336,7 +336,7 @@ def edit_word(word_id):
         return redirect('/?message=Need+to+be+teacher.')
 
     # Render the edit.html template with the retrieved data and pass it to the template
-    return render_template('edit.html', logged_in=is_logged_in(), word_de=about_word, word_id=word_id,
+    return render_template('edit.html', logged_in=is_logged_in(), word_detail=about_word, word_id=word_id,
                            categories=category_list, is_teacher=is_teacher())
 
 
