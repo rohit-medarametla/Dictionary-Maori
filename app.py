@@ -1,6 +1,5 @@
-from idlelib import query
-from flask import Flask, render_template, redirect, request, session, url_for, flash
-import os
+
+from flask import Flask, render_template, redirect, request, session
 import sqlite3
 from sqlite3 import Error
 from flask_bcrypt import Bcrypt
@@ -431,9 +430,6 @@ def edit_word(word_id):
                      " Maori=?, English=?, Definition=?, level=?, user_id_fk=?, entry_date=?, cat_id_fk=? "
                      "WHERE word_id=?", (maori_word, english_word, definition, level, user_id, date_added,
                                          cat_id, word_id))
-
-            # Flash a message indicating that the word has been updated
-            flash("The word has been updated!", "info")
 
             # Redirect to the page displaying all words
             return redirect('/allwords')
