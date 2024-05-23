@@ -156,6 +156,24 @@ def render_login():
 
     return render_template('login.html',  logged_in=is_logged_in(),)
 
+# Route for displaying all words in the dictionary
+@app.route('/allwords')
+def table():
+    # Retrieve a list of all categories from the database
+    category_list = get_list("SELECT cat_id, category_name FROM category", "")
+
+    # Retrieve a list of all words from the Dictionary table, including related category data
+    words_list = get_list(
+        "SELECT word_id, Maori, English, level, category_name FROM Dictionary m "
+        "INNER JOIN category c ON m.cat_id_fk = c.cat_id", "")
+
+    # Print the list of words to the console for debugging purposes
+    print(words_list)
+
+    # Render the allwords.html template with the list of words and other data
+    return render_template("allwords.html", word=words_list, logged_in=is_logged_in(), categories=category_list, is_teacher=is_teacher())
+
+
 
 
 # Define a route for accessing a specific category page based on its cat_id.
@@ -317,13 +335,13 @@ def edit_word(word_id):
             definition = request.form.get('Definition').lower().strip()
             level = request.form.get('level').lower().strip()
             user_id = session.get('user_id')
-            date_added = datetime.today().strftime('%Y-%m-%d')
+            date_time_added = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             cat_id = request.form.get('cat_id')
 
             # Update the word in the database
             put_data("UPDATE Dictionary SET"
                      " Maori=?, English=?, Definition=?, level=?, user_id_fk=?, entry_date=?, cat_id_fk=? "
-                     "WHERE word_id=?", (maori_word, english_word, definition, level, user_id, date_added, cat_id, word_id))
+                     "WHERE word_id=?", (maori_word, english_word, definition, level, user_id, date_time_added, cat_id, word_id))
 
             # Flash a message indicating that the word has been updated
             flash("The word has been updated!", "info")
@@ -453,24 +471,6 @@ def render_search():
     # Render the allwords.html template with the search results and other data
     return render_template("allwords.html", word=search_list, title=title, logged_in=is_logged_in(),
                            categories=category_list)
-
-
-# Route for displaying all words in the dictionary
-@app.route('/allwords')
-def table():
-    # Retrieve a list of all categories from the database
-    category_list = get_list("SELECT cat_id, category_name FROM category", "")
-
-    # Retrieve a list of all words from the Dictionary table, including related category data
-    words_list = get_list(
-        "SELECT word_id, Maori, English, level, category_name FROM Dictionary m "
-        "INNER JOIN category c ON m.cat_id_fk = c.cat_id", "")
-
-    # Print the list of words to the console for debugging purposes
-    print(words_list)
-
-    # Render the allwords.html template with the list of words and other data
-    return render_template("allwords.html", word=words_list, logged_in=is_logged_in(), categories=category_list, is_teacher=is_teacher())
 
 
 if __name__ == '__main__':
