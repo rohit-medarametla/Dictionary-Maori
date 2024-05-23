@@ -423,13 +423,13 @@ def edit_word(word_id):
             definition = request.form.get('Definition').lower().strip()
             level = request.form.get('level').lower().strip()
             user_id = session.get('user_id')
-            date_time_added = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            date_added = datetime.now().strftime('%Y-%m-%d ')
             cat_id = request.form.get('cat_id')
 
             # Update the word in the database
             put_data("UPDATE Dictionary SET"
                      " Maori=?, English=?, Definition=?, level=?, user_id_fk=?, entry_date=?, cat_id_fk=? "
-                     "WHERE word_id=?", (maori_word, english_word, definition, level, user_id, date_time_added,
+                     "WHERE word_id=?", (maori_word, english_word, definition, level, user_id, date_added,
                                          cat_id, word_id))
 
             # Flash a message indicating that the word has been updated
@@ -460,7 +460,7 @@ def render_search():
     title = "Search results for: " + search
 
     # SQL query to search for the term in various columns of the Dictionary table
-    query = ("SELECT word_id, Maori, English, definition, level, category_name FROM Dictionary m "
+    query = ("SELECT word_id, Maori, English,  level, category_name FROM Dictionary m "
              "INNER JOIN category c ON m.cat_id_fk = c.cat_id "
              "WHERE "
              "word_id LIKE ? OR Maori LIKE ? OR English LIKE ? OR definition LIKE ? OR level LIKE ? "
