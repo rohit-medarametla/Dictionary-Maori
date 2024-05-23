@@ -19,7 +19,7 @@
         <!-- Grouping for category name input -->
         <div class="form-label"><label for="name">Category Name:</label></div>
         <!-- Label for category name input -->
-        <div class="form-element"><input type="text" name="name" id="name" required></div>
+        <div class="form-element"><input type="text" name="name" id="name" maxlength="10" required></div>
         <!-- Input field for category name (required) -->
     </div>
     <div class="form-group">
@@ -39,29 +39,29 @@
         <!-- Grouping for Maori word input -->
         <div class="form-label"><label for="Maori"> Maori word name</label></div>
         <!-- Label for Maori word input -->
-        <div class="form-element"><input type="text" name="Maori" id="Maori"></div>
+        <div class="form-element"><input type="text" name="Maori" id="Maori" maxlength="100"></div>
         <!-- Input field for Maori word name -->
     </div>
     <div class="form-group">
         <!-- Grouping for English word input -->
         <div class="form-label"><label for="English"> English word name</label></div>
         <!-- Label for English word input -->
-        <div class="form-element"><input type="text" name="English" id="English"></div>
+        <div class="form-element"><input type="text" name="English" id="English"  maxlength="100"></div>
         <!-- Input field for English word name -->
     </div>
     <div class="form-group">
         <!-- Grouping for word definition input -->
         <div class="form-label"><label for="Definition"> Word definition</label></div>
         <!-- Label for word definition input -->
-        <div class="form-element"><input type="text" name="Definition" id="Definition"></div>
+        <div class="form-element"><input type="text" name="Definition" id="Definition"  maxlength="100"></div>
         <!-- Input field for word definition -->
     </div>
     <div class="form-group">
         <!-- Grouping for word level input -->
         <div class="form-label"><label for="level"> Word level</label></div>
         <!-- Label for word level input -->
-        <div class="form-element"><input type="text" name="level" id="level"></div>
-        <!-- Input field for word level -->
+        <div class="form-element"><input type="number" name="level" id="level" min="1" max="10"></div>
+        <!-- Input field for word level with min 1 and max 10 -->
     </div>
     <div class="form-group">
         <!-- Grouping for category selection -->

@@ -11,9 +11,6 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.secret_key = "qwertyuiop"
 
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 
 # this is a function that creates connection with database and queries what we want and store it in a variable
 def get_list(query, params):
@@ -27,7 +24,7 @@ def get_list(query, params):
     return query_list
 
 
-# this is a fuction that puts data in the database tables
+# this is a function that puts data in the database tables
 def put_data(query, params):
     with create_connection(DATABASE) as con:
         cur = con.cursor()
@@ -45,21 +42,9 @@ def create_connection(db_file):
         print("Error connecting to database:", e)
         return None
 
-
-# Function to check if a user is logged in
-def is_logged_in():
-    if session.get('email') is None:
-        return False
-    else:
-        return True
-
-
-# Function to check if a user is a teacher or student
-def is_teacher():
-    return session.get('is_teacher') == 1
-
-
 # Route for home page
+
+
 @app.route('/')
 def render_home():
     return render_template('home.html', logged_in=is_logged_in(), is_teacher=is_teacher())
@@ -71,27 +56,34 @@ def render_signup():
     # A if condition to check if user is logged in
     if is_logged_in():
         return redirect('allwords.html')
-    # if condition for loggin
+    # if condition for logging
     if request.method == 'POST':
         print(request.form)
         # getting the data from the form
         fname = request.form.get('fname').title()  # gets the first name and converts to tittle class
-        lname = request.form.get('lname').title().strip() # gets the last name and converts to tittle class and strip leading spaces
-        email = request.form.get('email').lower().strip() # gets email and, converts to lower case and strip leading spaces
-        password = request.form.get('password') # gets the password
-        password2 = request.form.get('password2') # Gets the confirm password
+        # gets the last name and converts to tittle class and strip leading spaces
+        lname = request.form.get('lname').title().strip()
+        # gets email and, converts to lower case and strip leading spaces
+        email = request.form.get('email').lower().strip()
+        password = request.form.get('password')  # gets the password
+        password2 = request.form.get('password2')  # Gets the confirm password
         # Defult teacher set to 0 and will be considered as a student
         teacher = 0
         # if the 'is_teacher' checkbox is checked set teacher flag to 1
         if request.form.get('is_teacher') == 'on':
             teacher = 1
+        # Validate that first name and last name do not contain digits
+        if any(char.isdigit() for char in fname):
+            return redirect("/signup?error=First+name+cannot+contain+numbers")
+        if any(char.isdigit() for char in lname):
+            return redirect("/signup?error=Last+name+cannot+contain+numbers")
         # checks if the password matches
         if password != password2:
             # Redirects to signup page with error message if passwords do 
-            return redirect("\signup?error=Passwords+do+not+match")
+            return redirect("/signup?error=Passwords+do+not+match")
         # checks if password has minimum of 8 charecter
         if len(password) < 8:
-            return redirect("\signup?error=Password+must+be+at+least+8+characters")
+            return redirect("/signup?error=Password+must+be+at+least+8+characters")
         # So this enters hashed password into database
         hashed_password = bcrypt.generate_password_hash(password)
         # this tries to run code
@@ -100,16 +92,18 @@ def render_signup():
                      (fname, lname, email, hashed_password, teacher))
         # this checks for any integrity error like duplicate email
         except sqlite3.IntegrityError:
-            return redirect('\signup?error=Email+is+already+used')
+            return redirect('/signup?error=Email+is+already+used')
 
         return redirect("/login")
     return render_template('signup.html', logged_in=is_logged_in(), is_teacher=is_teacher())
 
 # this routes codes the log in
+
+
 @app.route('/login', methods=['POST', 'GET'])
 def render_login():
 
-    if request.method == 'POST': # Check if the request method is POST, indicating that the form has been submitted.
+    if request.method == 'POST':  # Check if the request method is POST, indicating that the form has been submitted.
         # Retrieve the email and password from the form data, stripping any leading whitespace.
         # Convert the email to lowercase to ensure case-insensitive comparison.
         email = request.form['email'].strip().lower()
@@ -129,7 +123,8 @@ def render_login():
         con.close()
         # a if statement if user data is none then it redirect
         if user_data is None:
-            # Redirect the user back to the previous page (referrer) with an error message indicating invalid username or password
+            # Redirect the user back to the previous page (referrer) with an error message indicating invalid username
+            # or password
             redirect(request.referrer + '?error=Invalid+username+or+password')
 
         else:
@@ -156,6 +151,38 @@ def render_login():
 
     return render_template('login.html',  logged_in=is_logged_in(),)
 
+# Function to check if a user is logged in
+
+
+def is_logged_in():
+    if session.get('email') is None:
+        return False
+    else:
+        return True
+
+
+# Function to check if a user is a teacher or student
+def is_teacher():
+    return session.get('is_teacher') == 1
+
+# a route for logging out the user.
+
+
+@app.route('/logout')
+def logout():
+    # Print the keys in the session for testing purposes.
+    print(list(session.keys()))
+
+    # Remove all keys from the session.
+    [session.pop(key) for key in list(session.keys())]
+
+    # Print the keys in the session after removing them for testing purposes.
+    print(list(session.keys()))
+
+    # Redirect the user to the homepage with a message indicating successful logout.
+    return redirect('/?message=See+you+next+time!')
+
+
 # Route for displaying all words in the dictionary
 @app.route('/allwords')
 def table():
@@ -171,12 +198,29 @@ def table():
     print(words_list)
 
     # Render the allwords.html template with the list of words and other data
-    return render_template("allwords.html", word=words_list, logged_in=is_logged_in(), categories=category_list, is_teacher=is_teacher())
+    return render_template("allwords.html", word=words_list, logged_in=is_logged_in(),
+                           categories=category_list, is_teacher=is_teacher())
 
 
+#  a route for accessing the detail page of a specific word based on its word_id.
+@app.route('/word_detail/<word_id>')
+def render_word_detail(word_id):
+    # Retrieve a list of all categories from the database.
+    category_list = get_list("SELECT cat_id, category_name FROM category", "")
 
+    # Retrieve detailed information about the specified word from the database.
+    about_word = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname, "
+                          " entry_date FROM Dictionary m "
+                          "INNER JOIN user u on m.user_id_fk = u.user_id "
+                          "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
+
+    # Render the word_detail.html template with the retrieved word information and pass it to the template.
+    return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in(),
+                           categories=category_list, is_teacher=is_teacher())
 
 # Define a route for accessing a specific category page based on its cat_id.
+
+
 @app.route('/category/<cat_id>')
 def render_category(cat_id):
     # Set the title of the category page to the cat_id.
@@ -189,49 +233,17 @@ def render_category(cat_id):
     print(category_list)
 
     # uses get_list function to query and grab the data and stored it in words_list .
-    words_list = get_list("SELECT word_id, Maori, English, level, category_name"
-                                " FROM Dictionary m "
-                                "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE cat_id=?", (cat_id, ))
+    words_list = get_list("SELECT word_id, Maori, English, level, category_name "
+                          "FROM Dictionary m "
+                          "INNER JOIN category c ON m.cat_id_fk = c.cat_id "
+                          "WHERE cat_id=?", (cat_id,))
 
     # Print the recived words list to check if the code above is working right .
     print(words_list)
 
     # Render the category.html template with the received data and pass it to the template.
     return render_template("category.html", word=words_list, categories=category_list,
-                           logged_in=is_logged_in(), title=title)
-
-
-#  a route for accessing the detail page of a specific word based on its word_id.
-@app.route('/word_detail/<word_id>')
-def render_word_detail(word_id):
-    # Retrieve a list of all categories from the database.
-    category_list = get_list("SELECT cat_id, category_name FROM category", "")
-
-    # Retrieve detailed information about the specified word from the database.
-    about_word = get_list("SELECT word_id, Maori, English, Definition, level, image, category_name, fname, "
-                          "time_added , entry_date FROM Dictionary m "
-                          "INNER JOIN user u on m.user_id_fk = u.user_id "
-                          "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
-
-    # Render the word_detail.html template with the retrieved word information and pass it to the template.
-    return render_template("word_detail.html", wordinfo=about_word,  logged_in=is_logged_in(), categories=category_list, is_teacher=is_teacher())
-
-
-
-# a route for logging out the user.
-@app.route('/logout')
-def logout():
-    # Print the keys in the session for testing purposes.
-    print(list(session.keys()))
-
-    # Remove all keys from the session.
-    [session.pop(key) for key in list(session.keys())]
-
-    # Print the keys in the session after removing them for testing purposes.
-    print(list(session.keys()))
-
-    # Redirect the user to the homepage with a message indicating successful logout.
-    return redirect('/?message=See+you+next+time!')
+                           logged_in=is_logged_in(), title=title, is_teacher=is_teacher())
 
 
 #  a route for accessing the admin page.
@@ -293,7 +305,7 @@ def add_word():
         user_id = session.get('user_id')
 
         # Get the current date and time
-        date_time_added = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        date_added = datetime.now().strftime('%Y-%m-%d ')
 
         # Grabs the category ID from the form data
         category = request.form.get('cat_id')
@@ -304,58 +316,10 @@ def add_word():
         # Insert the new word into the database
         put_data('INSERT INTO Dictionary (Maori, English, Definition, level, image,  cat_id_fk, entry_date,'
                  ' user_id_fk ) VALUES (?,?,?,?,?,?,?,?)',
-                 (maori_word, english_word, definition, level, image, cat_id, date_time_added, user_id,))
+                 (maori_word, english_word, definition, level, image, cat_id, date_added, user_id,))
 
     # Redirect to the admin page after adding the word
     return redirect('/admin')
-
-
-# Route for editing a word
-@app.route('/edit/<word_id>', methods=['GET', 'POST'])
-def edit_word(word_id):
-    # Check if the user is logged in and is a teacher
-    if is_logged_in() and is_teacher():
-        # Grabs information about the word with the specified word_id
-        about_word = get_list(
-            "SELECT Maori, English, Definition, level, cat_id_fk"
-            " FROM Dictionary m "
-            "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
-
-        # Extract the first row from the result
-        about_word = about_word[0]
-
-        # Grabs a list of all categories from the database
-        category_list = get_list("SELECT cat_id, category_name FROM category", "")
-
-        # Check if the request method is POST
-        if request.method == "POST":
-            # Grabs updated word details from the form data
-            maori_word = request.form.get('Maori').lower().strip()
-            english_word = request.form.get('English').lower().strip()
-            definition = request.form.get('Definition').lower().strip()
-            level = request.form.get('level').lower().strip()
-            user_id = session.get('user_id')
-            date_time_added = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            cat_id = request.form.get('cat_id')
-
-            # Update the word in the database
-            put_data("UPDATE Dictionary SET"
-                     " Maori=?, English=?, Definition=?, level=?, user_id_fk=?, entry_date=?, cat_id_fk=? "
-                     "WHERE word_id=?", (maori_word, english_word, definition, level, user_id, date_time_added, cat_id, word_id))
-
-            # Flash a message indicating that the word has been updated
-            flash("The word has been updated!", "info")
-
-            # Redirect to the page displaying all words
-            return redirect('/allwords')
-
-    else:
-        # If the user is not logged in or is not a teacher, redirect to the homepage with a message
-        return redirect('/?message=Need+to+be+teacher.')
-
-    # Render the edit.html template with the retrieved data and pass it to the template
-    return render_template('edit.html', logged_in=is_logged_in(), word_detail=about_word, word_id=word_id,
-                           categories=category_list, is_teacher=is_teacher())
 
 
 # Route for rendering the delete page for category
@@ -431,6 +395,56 @@ def delete_word_confirm(word_id):
 
     # Redirect to the page displaying all words after deletion
     return redirect('/allwords')
+
+# Route for editing a word
+
+
+@app.route('/edit/<word_id>', methods=['GET', 'POST'])
+def edit_word(word_id):
+    # Check if the user is logged in and is a teacher
+    if is_logged_in() and is_teacher():
+        # Grabs information about the word with the specified word_id
+        about_word = get_list(
+            "SELECT Maori, English, Definition, level, cat_id_fk"
+            " FROM Dictionary m "
+            "INNER JOIN category c ON m.cat_id_fk = c.cat_id WHERE word_id=?", (word_id,))
+
+        # Extract the first row from the result
+        about_word = about_word[0]
+
+        # Grabs a list of all categories from the database
+        category_list = get_list("SELECT cat_id, category_name FROM category", "")
+
+        # Check if the request method is POST
+        if request.method == "POST":
+            # Grabs updated word details from the form data
+            maori_word = request.form.get('Maori').lower().strip()
+            english_word = request.form.get('English').lower().strip()
+            definition = request.form.get('Definition').lower().strip()
+            level = request.form.get('level').lower().strip()
+            user_id = session.get('user_id')
+            date_time_added = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            cat_id = request.form.get('cat_id')
+
+            # Update the word in the database
+            put_data("UPDATE Dictionary SET"
+                     " Maori=?, English=?, Definition=?, level=?, user_id_fk=?, entry_date=?, cat_id_fk=? "
+                     "WHERE word_id=?", (maori_word, english_word, definition, level, user_id, date_time_added,
+                                         cat_id, word_id))
+
+            # Flash a message indicating that the word has been updated
+            flash("The word has been updated!", "info")
+
+            # Redirect to the page displaying all words
+            return redirect('/allwords')
+
+    else:
+        # If the user is not logged in or is not a teacher, redirect to the homepage with a message
+        return redirect('/?message=Need+to+be+teacher.')
+
+    # Render the edit.html template with the retrieved data and pass it to the template
+    return render_template('edit.html', logged_in=is_logged_in(), word_detail=about_word, word_id=word_id,
+                           categories=category_list, is_teacher=is_teacher())
 
 
 # Route for rendering search results
