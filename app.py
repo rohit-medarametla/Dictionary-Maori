@@ -1,3 +1,5 @@
+import os
+PORT = int(os.environ.get("PORT", 10000))
 
 from flask import Flask, render_template, redirect, request, session
 import sqlite3
