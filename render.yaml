@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: Dictionary-Maori
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn -k eventlet -w 1 app:app
+    plan: free
